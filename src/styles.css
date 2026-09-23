@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #14110e;
+  --color-bg-raised: #1e1a16;
+  --color-paper: #f3eadb;
+  --color-paper-2: #e6dcc9;
+  --color-ink: #1c1915;
+  --color-ink-soft: #433e37;
+  --color-fg: #f3eadb;
+  --color-muted: #a3988c;
+  --color-faint: #746b62;
+  --color-line: #2c261f;
+  --color-line-strong: #413930;
+  --color-copper: #d4784a;
+  --color-copper-deep: #a4532c;
+  --color-moss: #9aaf90;
+  --color-moss-deep: #2c3828;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, georgia, serif;
+  --radius-sm: 0.375rem;
+  --radius: 0.75rem;
+  --radius-lg: 1.125rem;
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    min-height: 100%;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: #e8c4ae;
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-copper);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes limen-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.limen-pulse {
+  animation: limen-pulse 2.4s ease-in-out infinite;
+}

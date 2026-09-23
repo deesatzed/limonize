@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Limen",
+      "hasCanvas": false,
+      "bodyTextLen": 826,
+      "bodyTextHash": "dd39721a2315df66db5647b589cdc0b2b74ede8fcb4481f06a8fb5e5f55ae244",
+      "bodyTextPrefix": "LIMEN A witness at the threshold of what it knows. Quiet I have ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Limen",
+      "hasCanvas": false,
+      "bodyTextLen": 654,
+      "bodyTextHash": "c4cb6f1e8e5bbed34c2ecdd50fb1ea110f1ee130d4b21890cc1c22d88c7c03bf",
+      "bodyTextPrefix": "LIMEN quiet What is in front of you? Write the situation as you ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
