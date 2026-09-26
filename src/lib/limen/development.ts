@@ -454,7 +454,9 @@ function validateReview(value: unknown): PolicyReviewRecord {
   const row = exact(value, ["id", "policyVersionId", "track", "reviewKind", "verdict", "sourceEventIds", "reviewedAtSequence"], [], "policy review");
   if (typeof row.reviewKind !== "string" || !REVIEW_KINDS.has(row.reviewKind as PolicyReviewKind)) reject("invalid_review", "Review kind is invalid.");
   if (row.verdict !== "accepted" && row.verdict !== "rejected") reject("invalid_review", "Review verdict is invalid.");
-  return { id: id(row.id, "review ID"), policyVersionId: id(row.policyVersionId, "policyVersionId"), track: track(row.track), reviewKind: row.reviewKind as PolicyReviewKind, verdict: row.verdict, sourceEventIds: strings(row.sourceEventIds, "review sourceEventIds"), reviewedAtSequence: integer(row.reviewedAtSequence, "reviewedAtSequence", 1) };
+  const sourceEventIds = strings(row.sourceEventIds, "review sourceEventIds");
+  if (!sourceEventIds.length) reject("invalid_review", "Policy review must cite at least one source event.");
+  return { id: id(row.id, "review ID"), policyVersionId: id(row.policyVersionId, "policyVersionId"), track: track(row.track), reviewKind: row.reviewKind as PolicyReviewKind, verdict: row.verdict, sourceEventIds, reviewedAtSequence: integer(row.reviewedAtSequence, "reviewedAtSequence", 1) };
 }
 
 function validateTrial(value: unknown): ProspectiveTrialRecord {
@@ -656,7 +658,11 @@ function onEvent(state: DevelopmentReplay, event: DevelopmentEvent): void {
       const { review } = event.payload;
       const policy = state.policies.find((row) => row.id === review.policyVersionId);
       if (!policy || policy.supersededByVersionId || policy.track !== review.track || latestPolicy(state, policy.policyId)?.id !== policy.id) reject("invalid_reference", "Review must match the latest retained policy version and track.");
-      for (const sourceEventId of review.sourceEventIds) expectBefore(state, sourceEventId, event.sequence, "Policy review");
+      for (const sourceEventId of review.sourceEventIds) {
+        expectBefore(state, sourceEventId, event.sequence, "Policy review");
+        const sourceEvent = state.events.find((row) => row.id === sourceEventId);
+        if (!sourceEvent || eventTrack(sourceEvent) !== review.track) reject("track_mismatch", "Policy review sources must match the reviewed policy track.");
+      }
       if (review.reviewedAtSequence !== event.sequence) reject("invalid_review", "Review sequence must match its ledger event.");
       uniqueRecordId(state.reviews, review, "Policy review");
       state.reviews.push(review);
@@ -673,7 +679,9 @@ function onEvent(state: DevelopmentReplay, event: DevelopmentEvent): void {
       const expectation = state.expectations.find((row) => row.id === resolution.expectationId);
       if (!expectation || expectation.familyId !== trial.familyId || expectation.context.worldVersion !== trial.worldVersion) reject("invalid_trial", "Trial family or world version does not match its resolved expectation.");
       const supportFamilies = policy.supportResolutionIds.map((resolutionId) => state.resolutions.find((row) => row.id === resolutionId)).filter(Boolean).map((row) => state.expectations.find((e) => e.id === row!.expectationId)?.familyId);
+      const supportCases = new Set(policy.supportResolutionIds.map((resolutionId) => state.resolutions.find((row) => row.id === resolutionId)?.caseId));
       if (supportFamilies.includes(trial.familyId)) reject("nonprospective_trial", "A policy discovery family cannot count as its prospective trial.");
+      if (supportCases.has(trial.caseId)) reject("nonprospective_trial", "A policy discovery case cannot count as its prospective trial.");
       if (trial.outcome === "supports" && policy.action.kind === "prefer_check" && trial.selectedCheckId !== policy.action.actionId) reject("invalid_trial", "A supporting preference trial must select its declared check.");
       if (trial.outcome === "quiet_control" && trial.baselineCheckId !== trial.selectedCheckId) reject("invalid_trial", "A quiet control must preserve the baseline selection.");
       if (state.trials.some((row) => row.id === trial.id || (row.policyVersionId === trial.policyVersionId && row.familyId === trial.familyId))) reject("duplicate_trial", "Trial ID or policy-family trial already exists.");
@@ -694,8 +702,19 @@ function onEvent(state: DevelopmentReplay, event: DevelopmentEvent): void {
       };
       if (policy.track === "real" && transition.toState !== "suspended" && transition.toState !== "retired") reject("advisory_only", "Real policies cannot enter an autonomous testing or active lifecycle.");
       if (!allowed[policy.lifecycle].includes(transition.toState)) reject("invalid_transition", `Cannot transition policy from ${policy.lifecycle} to ${transition.toState}.`);
-      if (transition.toState === "testing" && transition.reasonCode !== "candidate_trial") reject("invalid_transition", "Testing requires the candidate_trial reason.");
-      if (transition.toState === "active") reject("activation_not_enabled", "Policy activation is not enabled in the typed-contract milestone.");
+      if (transition.toState === "testing") {
+        if (transition.reasonCode !== "candidate_trial") reject("invalid_transition", "Testing requires the candidate_trial reason.");
+        requireAcceptedReviews(state, policy.id);
+      }
+      if (transition.toState === "active") {
+        if (transition.reasonCode !== "prospective_trials_passed") reject("invalid_transition", "Simulation admission requires prospective_trials_passed.");
+        if (policy.track !== "simulated" || policy.scope.kind !== "simulation") reject("advisory_only", "Only named simulation policies may be admitted.");
+        requireAcceptedReviews(state, policy.id);
+        const trials = state.trials.filter((row) => row.policyVersionId === policy.id);
+        const contributed = trials.some((row) => row.outcome === "supports" && row.selectedCheckId !== row.baselineCheckId && (policy.action.kind !== "prefer_check" || row.selectedCheckId === policy.action.actionId));
+        const control = trials.some((row) => row.outcome === "contradicts" || row.outcome === "quiet_control");
+        if (!contributed || !control) reject("admission_gate", "Admission requires a changed successful prospective selection and a contradiction or quiet control.");
+      }
       if (transition.toState === "suspended" && !["contradiction", "context_changed", "objective_changed", "method_changed", "support_revoked"].includes(transition.reasonCode)) reject("invalid_transition", "Suspension requires a named reconsideration reason.");
       if (transition.toState === "retired" && transition.reasonCode !== "explicit_retirement") reject("invalid_transition", "Retirement requires an explicit retirement reason.");
       policy.lifecycle = transition.toState;
@@ -730,6 +749,28 @@ function onEvent(state: DevelopmentReplay, event: DevelopmentEvent): void {
 
 function latestPolicy(state: DevelopmentReplay, policyId: string): PolicyVersionView | undefined {
   return state.policies.filter((row) => row.policyId === policyId).sort((a, b) => b.version - a.version)[0];
+}
+
+function eventTrack(event: DevelopmentEvent): ExperienceTrack | undefined {
+  switch (event.kind) {
+    case "expectation.recorded": return event.payload.expectation.track;
+    case "observation.released": return event.payload.observation.track;
+    case "expectation.resolved": return event.payload.resolution.track;
+    case "competence.derived": return event.payload.summary.track;
+    case "policy.version_recorded": return event.payload.policyVersion.track;
+    case "policy.reviewed": return event.payload.review.track;
+    case "policy.trial_recorded": return event.payload.trial.track;
+    case "policy.applied": return event.payload.application.track;
+    default: return undefined;
+  }
+}
+
+function requireAcceptedReviews(state: DevelopmentReplay, policyVersionId: string): void {
+  const latest = new Map<PolicyReviewKind, PolicyReviewRecord>();
+  for (const review of state.reviews.filter((row) => row.policyVersionId === policyVersionId).sort((a, b) => a.reviewedAtSequence - b.reviewedAtSequence)) latest.set(review.reviewKind, review);
+  for (const kind of REVIEW_KINDS) {
+    if (latest.get(kind)?.verdict !== "accepted") reject("review_required", `Policy needs a current accepted ${kind} review.`);
+  }
 }
 
 function sourceRecord(event: DevelopmentEvent): Dict | null {

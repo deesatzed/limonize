@@ -1,3 +1,5 @@
+import type { SelectionRecord } from "./selection";
+
 export type Stakes = "low" | "consequential" | "irreversible";
 export type Reversible = "yes" | "partial" | "no";
 export type Answer = "yes" | "no" | "unknown";
@@ -205,6 +207,7 @@ export interface EngineResult {
   flyPrior: string | null;
   records: FourRecords;
   router: RouterChoice;
+  selection?: SelectionRecord;
   jev: JevJudgment[];
   hive: HiveSeat[];
   proposals: OrgProposal[];
@@ -372,6 +375,7 @@ export interface SitInput {
   now?: number;
   opBias?: Partial<Record<FlyOp, number>>;
   subBias?: Record<string, number>;
+  selection?: SelectionRecord;
 }
 
 export interface SelfReport {

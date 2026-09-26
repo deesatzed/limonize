@@ -4,7 +4,8 @@ import { featurePhrases, RULE_NAMES, runEngine } from "./engine";
 import { extractFeatures } from "./fly";
 import { checkReportArtifact } from "./check";
 import { createReportExpectation, resolveReportReceipt } from "./expectations";
-import { replayDevelopment, type DevelopmentEvent, type ExpectationRecord } from "./development";
+import { activePolicyVersions, replayDevelopment, type DevelopmentEvent, type ExpectationRecord } from "./development";
+import { selectNextCheck } from "./selection";
 import { currentOutcome, deriveLearning, dueFollowUps, effectiveFeedback } from "./ledger";
 import { migrateLegacy, migrateV2, parseImport, validateData } from "./data";
 import { guardedStorage } from "./storage";
@@ -38,6 +39,44 @@ function fingerprintText(value: string): string {
   let hash = 0x811c9dc5;
   for (const byte of new TextEncoder().encode(value)) hash = Math.imul(hash ^ byte, 0x01000193);
   return `fnv1a32:${(hash >>> 0).toString(16).padStart(8, "0")}`;
+}
+
+function applicationForSelection(
+  events: DevelopmentEvent[],
+  selection: NonNullable<ReturnType<typeof runEngine>["selection"]> | undefined,
+  situation: Situation,
+  runId: string,
+  at: number,
+): DevelopmentEvent[] {
+  if (!selection?.contributed || !selection.baselineCheckId || !selection.selectedCheckId || selection.policyVersionIds.length !== 1) return events;
+  const replay = replayDevelopment(events);
+  const policy = replay.policies.find((row) => row.id === selection.policyVersionIds[0]);
+  if (!policy || policy.lifecycle !== "active" || policy.track !== "simulated") return events;
+  const sourceEventIds = replay.events.filter((event) =>
+    (event.kind === "policy.version_recorded" && event.payload.policyVersion.id === policy.id)
+    || (event.kind === "expectation.resolved" && selection.supportResolutionIds.includes(event.payload.resolution.id)),
+  ).map((event) => event.id);
+  if (!sourceEventIds.length) return events;
+  const next: DevelopmentEvent = {
+    id: `application:${runId}:${policy.id}`,
+    sequence: replay.lastSequence + 1,
+    at,
+    schemaVersion: 1,
+    kind: "policy.applied",
+    payload: { application: {
+      id: `application-record:${runId}:${policy.id}`,
+      policyVersionId: policy.id,
+      caseId: situation.id,
+      runId,
+      track: "simulated",
+      baselineCheckId: selection.baselineCheckId,
+      selectedCheckId: selection.selectedCheckId,
+      sourceEventIds,
+      contributed: true,
+      costUnits: selection.costUnits,
+    } },
+  };
+  return replayDevelopment([...events, next]).events;
 }
 
 export interface LimenStore {
@@ -158,7 +197,7 @@ function runFor(situation: Situation, get: () => LimenStore, runId?: string) {
   }) : [];
   const contextualIds = new Set(contextual.map((event) => event.caseId));
   const contextualLearning = deriveLearning(contextual, state.sittings, state.situations, state.roleEvents.filter((event) => contextualIds.has(event.caseId)));
-  const result = runEngine({
+  const engineInput = {
     prose: situation.prose,
     claim: situation.claim,
     objective: situation.objective,
@@ -182,7 +221,37 @@ function runFor(situation: Situation, get: () => LimenStore, runId?: string) {
     opBias: contextualLearning.opBias,
     subBias: state.learningPaused ? {} : { ...state.roleBias, ...contextualLearning.subBias },
     selfReport: situation.mode === "self" ? selfReport(get) : undefined,
-  });
+  };
+  const baseline = runEngine(engineInput);
+  const rehearsal = situation.mode === "case" && situation.episode === "reviewer" && state.developmentEnabled;
+  let result = baseline;
+  if (rehearsal) {
+    const hasCheckGap = baseline.gaps.some((gap) => gap.kind === "observation" || gap.kind === "evidence");
+    const eligibleChecks = hasCheckGap ? ["check-acceptance", "trace-lineage"] as const : [];
+    const baselineCheckId = eligibleChecks.length
+      ? baseline.router.op === "check_source" ? "check-acceptance" as const : "trace-lineage" as const
+      : null;
+    const context = {
+      objectiveVersionId: fingerprintText(situation.objective.trim() || "objective-missing"),
+      contextVersionId: fingerprintText(`${situation.episode}:${situation.stakes}:${situation.reversible}`),
+      stakes: situation.stakes,
+      methodVersion: "limen-checks-1",
+      workflow: "review" as const,
+      worldVersion: "luna-world-v1",
+    };
+    const policies = activePolicyVersions(replayDevelopment(state.developmentEvents));
+    const selection = selectNextCheck({
+      track: "simulated",
+      context,
+      eligibleChecks: [...eligibleChecks],
+      baselineCheckId,
+      baselineOperation: baseline.router.op,
+      policies,
+      developmentEnabled: state.developmentEnabled,
+      learningPaused: state.learningPaused,
+    });
+    result = runEngine({ ...engineInput, selection });
+  }
   return { ...result, memoryCandidates: state.learningPaused ? [] : retrieveMemories(state.memories, result.features) };
 }
 
@@ -226,9 +295,11 @@ export const useLimen = create<LimenStore>()(
         const sittingId = uid();
         const result = runFor(situation, get, sittingId);
         const sitting: Sitting = { id: sittingId, situationId: situation.id, at: Date.now(), result, snapshot: structuredClone(situation), revisionReason: "initial" };
+        const developmentEvents = applicationForSelection(get().developmentEvents, result.selection, situation, sittingId, sitting.at);
         set({
           situations: [situation, ...get().situations],
           sittings: [sitting, ...get().sittings],
+          developmentEvents,
           activeSittingId: sitting.id,
           view: "mind",
           ruleStats: bumpFires(get().ruleStats, sitting),

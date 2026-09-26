@@ -21,6 +21,7 @@ import type {
   Sitting,
   Verdict,
 } from "@/lib/limen/types";
+import type { SelectionRecord } from "@/lib/limen/selection";
 
 const KIND_LABEL: Record<GapKind, string> = {
   observation: "Observation",
@@ -189,7 +190,7 @@ function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitti
         <p className="text-sm text-muted">All roles here are local procedures. External reflection is disabled until shared usage controls are available.</p>
       ) : null}
 
-      {result.router && result.jev ? <ClerkPanel router={result.router} jev={result.jev} /> : null}</details>
+      {result.router && result.jev ? <ClerkPanel router={result.router} jev={result.jev} selection={result.selection} /> : null}</details>
 
       {result.perturbations && (situation.episode === "reviewer" || result.features.includes("sig:handoff") || result.perturbations.irrelevant.ran || result.perturbations.decisive.ran) ? (
         <PerturbPanel perturbations={result.perturbations} demo={situation.episode === "reviewer"} onCheck={applyCheck} />
@@ -649,16 +650,17 @@ function HivePanel({
   );
 }
 
-function ClerkPanel({ router, jev }: { router: RouterChoice; jev: JevJudgment[] }) {
+function ClerkPanel({ router, jev, selection }: { router: RouterChoice; jev: JevJudgment[]; selection?: SelectionRecord }) {
   return (
     <section>
       <h2 className="font-serif text-2xl text-fg">Operation and typed clerk</h2>
       <p className="mt-3 text-lg text-fg">{OP_LABEL[router.op]}</p>
       <p className="mt-2 text-sm leading-relaxed text-muted">{router.why}</p>
       <p className="mt-1 text-xs text-faint">
-        {router.fromLearning ? "Chosen because earlier marks outweighed the prior." : "Chosen from the prior, not from a learned override."}{" "}
+        {selection?.contributed ? "An admitted, context-matched simulation policy changed this check." : router.fromLearning ? "Chosen from the existing adaptive-mark experiment." : "Chosen from the prior; no learned check preference changed it."}{" "}
         Then the roles: {router.roles?.length ? router.roles.join(", ") : "none"}. The fly tag did not make this choice.
       </p>
+      {selection ? <p className="mt-2 text-xs text-faint">Simulation selection record: baseline {selection.baselineCheckId ?? "none"}; selected {selection.selectedCheckId ?? "none"}; eligible {selection.eligibleChecks.join(", ") || "none"}; cost {selection.costUnits}. Policy {selection.policyVersionIds.join(", ") || "none"}.</p> : null}
       <div className="mt-6 space-y-4">
         <p className="text-sm text-muted">
           Jev-style questions, run locally. Not TypeSafe Jev, not calibrated, and not a model seat. A classifier over

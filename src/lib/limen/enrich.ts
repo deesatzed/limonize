@@ -396,7 +396,16 @@ export function enrich(
   extras?: { paraphraseStable: boolean | null },
 ): EngineResult {
   const full = result as EngineResult;
-  const router = chooseRouter(full, input);
+  const baselineRouter = chooseRouter(full, input);
+  const router = input.selection
+    ? {
+      ...baselineRouter,
+      op: input.selection.operation,
+      roles: input.selection.roles,
+      fromLearning: input.selection.contributed,
+      why: input.selection.reason,
+    }
+    : baselineRouter;
   const records = buildRecords(input, full);
   const supportIds = records.environment.filter((row) => row.status === "reported" || row.status === "verified_check" || row.status === "simulated").map((row) => row.id);
   const unresolvedIds = Object.values(records).flat().filter((row) => row.status === "unresolved").map((row) => row.id);
@@ -405,6 +414,7 @@ export function enrich(
     asks: result.asks.map((ask) => ({ ...ask, supportIds, unresolvedIds })),
     actions: result.actions.map((action) => ({ ...action, supportIds, unresolvedIds })),
     router,
+    ...(input.selection ? { selection: structuredClone(input.selection) } : {}),
     records,
     jev: buildJev(input, full),
     hive: buildHive(input, full, router.roles),

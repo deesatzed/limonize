@@ -191,7 +191,7 @@ test("deletion removes dependent history and later records cannot restore it imp
   assert.throws(() => replayDevelopment([expectation, observation, resolution, deletion, later]), /dependency was deleted/);
 });
 
-test("policies can enter testing but activation stays disabled in the contract milestone", () => {
+test("policies need three accepted reviews, a changed supporting trial and a contradiction or quiet control", () => {
   const prefix = learningPrefix();
   const version = event("policy.version_recorded", { policyVersion: policyVersion() }, 4, "policy-version-v1");
   const reviews = reviewEvents();
@@ -201,7 +201,10 @@ test("policies can enter testing but activation stays disabled in the contract m
   const state = replayDevelopment([...prefix, version, ...reviews, testing, ...trials]);
   assert.equal(state.policies[0]?.lifecycle, "testing");
   assert.equal(activePolicyVersions(state).length, 0);
-  assert.throws(() => replayDevelopment([...prefix, version, ...reviews, testing, ...trials, activation]), /not enabled in the typed-contract milestone/);
+  const admitted = replayDevelopment([...prefix, version, ...reviews, testing, ...trials, activation]);
+  assert.equal(admitted.policies[0]?.lifecycle, "active");
+  assert.equal(activePolicyVersions(admitted).length, 1);
+  assert.throws(() => replayDevelopment([...prefix, version, ...reviews.slice(0, 2), testing]), /current accepted continuity review/);
 });
 
 test("a newer policy version shadows its predecessor and cannot silently reactivate it", () => {

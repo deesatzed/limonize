@@ -40,8 +40,8 @@ replayable records, and rejects later implicit restoration.
 | `policy.version_recorded` | `policyVersion` | Own version `id`, stable `policyId`, sequential integer version and explicit predecessor when version >1; scope/track/context agree; support IDs cite retained same-track resolutions in the recorded context. |
 | `policy.reviewed` | `review` | Own ID, latest policy-version ID and matching track, one of contract/evidence/continuity, accepted/rejected verdict, earlier source-event IDs and a review sequence equal to its envelope sequence. |
 | `policy.trial_recorded` | `trial` | Own ID, latest simulation policy under test, distinct prospective family, matching simulation world and a resolved case/run/outcome; baseline and selected action IDs are explicit. |
-| `policy.transitioned` | `transition` | Policy-version ID, permitted lifecycle transition and finite reason code. L02 permits candidate→testing, suspension and retirement records; active transitions are rejected until the later admission task. |
-| `policy.applied` | `application` | Own ID, latest active simulation-policy version, simulated case/run, earlier source events, baseline/selected action IDs, honest contribution flag and finite cost. No application can be produced by this L02 implementation because activation is disabled. |
+| `policy.transitioned` | `transition` | Policy-version ID, permitted lifecycle transition and finite reason code. L07 admits only a latest simulation policy with accepted contract/evidence/continuity reviews and an attributed changed supporting prospective selection plus contradiction or quiet control. Real policies remain advisory. |
+| `policy.applied` | `application` | Own ID, latest active simulation-policy version, simulated case/run, earlier source events, baseline/selected action IDs, honest contribution flag and finite cost. The store emits an application only when the matching active simulation policy actually changes an eligible check; imports discard admission/application records. |
 | `job.queued` | `job` | Own ID, earlier source-event ID, one of three enumerated local job kinds and an input version. Scheduling/recovery is implemented in L08. |
 | `dependency.deleted` | `dependency` | One named case/run/evidence/receipt/expectation/observation/resolution/policy ID. Deletion redacts dependent ledger records in replay and leaves a tombstone. |
 
@@ -61,10 +61,13 @@ objective replacement, learning enable/pause field, or permission/authority
 field is accepted in a learned payload.
 
 Real-track policies have `real_advisory` scope and cannot steer. Simulation
-scope must name its world version. The event types reserve review, trial,
-transition and application records for later steps, but an event history alone
-does not authorize runtime writes. Admission requires the later policy-review
-and selection implementation; L02 explicitly rejects `active` transitions.
+scope must name its world version. L02 initially rejected `active` transitions;
+L07 now permits a narrowly scoped simulation admission only when the latest
+version has all three current accepted reviews, matching-track sources, at
+least one distinct-family/case prospective success that changes the baseline,
+and a contradiction or quiet control. The independent L10 comparison remains
+the benefit verdict and can keep the policy shadow/advisory. Import strips
+reviews, trials and transitions, so imported definitions return as candidates.
 
 ## Versioning and deferred behavior
 
