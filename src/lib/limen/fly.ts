@@ -1,4 +1,5 @@
 import type { FlyEngram, SitInput } from "./types";
+import { findAssertion } from "./interpret";
 
 /** Fixed feature order. The projection below is a pure function of this list. */
 export const FEATURES = [
@@ -90,7 +91,7 @@ function claws(): number[][] {
 
 const CLAW_TABLE = claws();
 
-export function extractFeatures(input: Pick<SitInput, "prose" | "claim" | "objective" | "choice" | "stakes" | "reversible" | "mode" | "dismissed" | "revealed">): FeatureId[] {
+export function extractFeatures(input: Pick<SitInput, "prose" | "claim" | "objective" | "choice" | "stakes" | "reversible" | "mode" | "episode" | "dismissed" | "revealed" | "receipts">): FeatureId[] {
   const text = `${input.prose}\n${input.claim}\n${input.objective}\n${input.choice}`.toLowerCase();
   const dismissed = new Set(input.dismissed);
   const on = new Set<FeatureId>();
@@ -101,14 +102,14 @@ export function extractFeatures(input: Pick<SitInput, "prose" | "claim" | "objec
     if (hit) on.add(id);
   };
 
-  allow("sig:shared-ancestor", /several|same table|one table|copied|repeat|single ancestor|all (come|came) from|documents agree/.test(text));
-  allow("sig:incentive", /supplier|vendor|sales|quote|quoted|commission|benefits if|who gains|incentive/.test(text));
-  allow("sig:unmeasured", /not fully described|not (fully |well )?(described|known|measured|specified)|unmeasured|was never measured|we do not know|we don't know|missing measurement|unknown environment|isn't known|is not known/.test(text));
-  allow("sig:context-shift", /environment|operating|outdoor|in the field|real world|laboratory|transfer|different setting|roll it out|more widely|population/.test(text));
-  allow("sig:disagreement", /disagree|different convention|inconsistent|on the other hand|conflict|does not match|doesn't match/.test(text));
-  allow("sig:closure", /inclined|seems (better|preferable)|appears preferable|obviously|definitely|certainly|no doubt|just order|call (it|the) improved/.test(text));
-  allow("sig:pressure", /today|immediately|as soon as|downtime|deadline|cannot wait|can't wait|commit now|right away/.test(text));
-  allow("sig:relevance", /lighter|lightest|weighs less|cheaper|faster/.test(text) && !/weight|mass|lightness/.test(input.objective.toLowerCase()));
+  allow("sig:shared-ancestor", !!findAssertion(input, /(?:same|one|single|shared) (?:source|table|ancestor|specification)|copied (?:from|the same)|documents (?:share|copy)|all (?:come|came) from/i));
+  allow("sig:incentive", !!findAssertion(input, /(?:supplier|vendor|salesperson|commission|incentive|benefits if|who gains)/i));
+  allow("sig:unmeasured", !!findAssertion(input, /(?:not fully described|not (?:fully |well )?(?:described|known|measured|specified)|unmeasured|was never measured|we do not know|we don't know|missing measurement|unknown environment|isn't known|is not known)/i));
+  allow("sig:context-shift", !!findAssertion(input, /(?:different|new|changed) (?:environment|setting|population|context)|(?:laboratory|lab) (?:to|versus|vs) (?:field|real world)|roll it out|transfer (?:to|from)/i));
+  allow("sig:disagreement", !!findAssertion(input, /disagree|different convention|inconsistent|on the other hand|conflict|does not match|doesn't match/i));
+  allow("sig:closure", !!findAssertion(input, /inclined|seems (?:better|preferable)|appears preferable|obviously|definitely|certainly|no doubt|just order|call (?:it|the) improved/i));
+  allow("sig:pressure", !!findAssertion(input, /today|immediately|as soon as|downtime|deadline|cannot wait|can't wait|commit now|right away/i));
+  allow("sig:relevance", !!findAssertion(input, /lighter|lightest|weighs less|cheaper|faster/i) && !/weight|mass|lightness/.test(input.objective.toLowerCase()));
   allow(
     "sig:metric-drift",
     /(score|metric|dashboard|kpi|alert).{0,80}(improv|cleaner|better|fewer)/.test(text) ||
@@ -120,7 +121,7 @@ export function extractFeatures(input: Pick<SitInput, "prose" | "claim" | "objec
   allow("sig:reflexive", /false alarm|prevention|phrases avoid|learned which|changed (the |their )?behavior|behaviour|people adapt|gaming the/.test(text));
   allow("sig:hedged", /i think|i feel|not sure|unsure|probably|might|perhaps|i may/.test(text));
   allow("sig:handoff", /cannot approve|success code|tool returned|tool finished/.test(text));
-  allow("sig:schema", (input.revealed ?? []).includes("schema-fail"));
+  allow("sig:schema", (input.episode === "reviewer" && (input.revealed ?? []).includes("schema-fail")) || (input.receipts ?? []).some((r) => r.outcome === "fail"));
 
   on.add(`stakes:${input.stakes}`);
   on.add(`rev:${input.reversible}`);

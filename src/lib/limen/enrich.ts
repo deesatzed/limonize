@@ -14,17 +14,6 @@ import type {
   OrgProposal,
 } from "./types";
 
-const OPS: FlyOp[] = [
-  "continue",
-  "check_source",
-  "test_alternative",
-  "ask",
-  "reframe",
-  "rehearse",
-  "escalate",
-  "stop",
-];
-
 const OP_WHY: Record<FlyOp, string> = {
   continue: "Nothing decisive is open. Continuing is the operation, not a new investigation.",
   check_source: "The next useful operation is to inspect a source or a prerequisite, not to argue.",
@@ -55,22 +44,10 @@ function priorOp(result: EngineResult, input: SitInput): FlyOp {
 
 export function chooseRouter(result: Pick<EngineResult, "features" | "attention" | "gaps" | "asks">, input: SitInput): RouterChoice {
   const base = priorOp(result as EngineResult, input);
-  const bias = input.opBias ?? {};
-  let best: FlyOp = base;
-  let bestScore = (bias[base] ?? 0) + 1.25;
-  let learned = false;
-  for (const op of OPS) {
-    const score = (bias[op] ?? 0) + (op === base ? 1.25 : 0);
-    if (score > bestScore + 0.01) {
-      best = op;
-      bestScore = score;
-      learned = true;
-    }
-  }
-  const why = learned
-    ? `Marks from earlier sittings shifted the operation from ${base.replaceAll("_", " ")} to ${best.replaceAll("_", " ")}. ${OP_WHY[best]} This is not a counterfactual about the branch that was not taken.`
-    : OP_WHY[best];
-  return { op: best, why, fromLearning: learned, roles: rolesFor(best) };
+  const pendingCheck = has(result.features, "sig:schema") || result.gaps.some((g) => g.decisive && (g.kind === "observation" || g.kind === "evidence"));
+  const op = pendingCheck && !["check_source", "ask", "escalate"].includes(base) ? "check_source" : base;
+  const why = `${OP_WHY[op]} Stored operation marks are advisory; they do not change the selected operation while action alignment is unverified.`;
+  return { op, why, fromLearning: false, roles: rolesFor(op) };
 }
 
 function rolesFor(op: FlyOp): RoleId[] {
@@ -84,42 +61,50 @@ function rolesFor(op: FlyOp): RoleId[] {
 }
 
 function item(status: EvidenceItem["status"], text: string): EvidenceItem {
-  return { status, text };
+  return { id: "", status, text, origin: status === "reported" ? "user" : status === "simulated" ? "demo" : status === "verified_check" ? "checker" : "rule", at: 0, caseId: "", runId: "" };
 }
 
 export function buildRecords(input: SitInput, result: EngineResult): FourRecords {
-  const revealed = new Set(input.revealed ?? []);
+  const demoSchema = input.episode === "reviewer" && (input.revealed ?? []).includes("schema-fail");
+  const failure = (input.receipts ?? []).find((r) => r.outcome === "fail");
+  const checked = !!failure || demoSchema;
   const environment: EvidenceItem[] = [
-    item("observed", "What follows was reported in the packet. It was not independently witnessed."),
+    item("inferred", "The situation below was reported by the user. It was not independently witnessed."),
   ];
-  if (input.prose.trim()) environment.push(item("observed", input.prose.trim()));
+  if (input.prose.trim()) environment.push(item("reported", input.prose.trim()));
   if (has(result.features, "sig:handoff")) {
-    environment.push(item("observed", "A success code was reported. A success code is not an acceptance."));
+    environment.push(item("inferred", "The wording suggests a process finished. Execution alone is not acceptance."));
     environment.push(
-      revealed.has("schema-fail")
-        ? item("observed", "A check against the current schema failed. The report used an outdated schema. That check is now part of the environment record.")
+      checked
+        ? demoSchema
+          ? item("simulated", "In this example, a simulated check reveals an outdated report schema. No user artifact was checked.")
+          : { ...item("verified_check", `The recorded ${failure?.criterion} document-shape check failed. ${failure?.detail}`), receiptId: failure?.id }
         : item("unresolved", "Whether the output meets the current acceptance criteria has not been checked. The hidden defect, if any, is not in this record yet."),
     );
   }
-  if (revealed.has("schema-fail") && !has(result.features, "sig:handoff")) {
-    environment.push(item("observed", "A schema check was run and failed."));
+  if (failure && !has(result.features, "sig:handoff")) {
+    environment.push({ ...item("verified_check", `The recorded ${failure.criterion} document-shape check failed. ${failure.detail}`), receiptId: failure.id });
+  }
+  for (const receipt of input.receipts ?? []) {
+    if (receipt === failure) continue;
+    environment.push({ ...item(receipt.outcome === "error" ? "unresolved" : "verified_check", `Document-shape check ${receipt.outcome}: ${receipt.detail}`), receiptId: receipt.id });
   }
 
   const perception: EvidenceItem[] = [
-    item("observed", "Every seat received the same packet: the prose, the claim, the objective, the inclined move, and the stakes. No seat received another seat's private context."),
+    item("simulated", "Local role procedures use the same provided packet. Disconnected model names did not inspect private context."),
   ];
-  if (!revealed.has("schema-fail") && input.episode === "reviewer") {
+  if (!checked && input.episode === "reviewer") {
     perception.push(item("unresolved", "The current schema was not in the packet. A seat that reasons only from the packet cannot already know it."));
   }
   for (const reading of result.readings) {
-    perception.push(item(reading.status === "confirmed" ? "observed" : "inferred", reading.text));
+    perception.push({ ...item(reading.status === "confirmed" ? "reported" : "inferred", reading.text), source: reading.source });
   }
   if (!result.readings.length) {
     perception.push(item("unresolved", "No wording-based reading was asserted."));
   }
 
   const belief: EvidenceItem[] = result.gaps.map((g) => item("inferred", `${g.kind}: ${g.summary}`));
-  if (has(result.features, "sig:handoff") && !revealed.has("schema-fail")) {
+  if (has(result.features, "sig:handoff") && !checked) {
     belief.push(
       item(
         "inferred",
@@ -127,7 +112,7 @@ export function buildRecords(input: SitInput, result: EngineResult): FourRecords
       ),
     );
   }
-  if (revealed.has("schema-fail")) {
+  if (checked) {
     belief.push(
       item(
         "inferred",
@@ -146,22 +131,35 @@ export function buildRecords(input: SitInput, result: EngineResult): FourRecords
       ),
     );
   }
-  return { environment, perception, belief, self };
-}
-
-function round(n: number): string {
-  return n.toFixed(2);
+  const at = input.now ?? Date.now();
+  const stamp = (category: keyof FourRecords, rows: EvidenceItem[]) => rows.map((row, index) => ({
+    ...row,
+    id: `${input.runId ?? "unbound"}:${category}:${index}`,
+    at,
+    caseId: input.caseId ?? "unbound",
+    runId: input.runId ?? "unbound",
+    ...(category === "environment" && index === 1 && row.status === "reported"
+      ? { source: { field: "prose" as const, start: 0, end: input.prose.length } }
+      : {}),
+    ...(row.status === "verified_check" && failure && row.text.includes(failure.criterion)
+      ? { receiptId: failure.id }
+      : {}),
+  }));
+  return {
+    environment: stamp("environment", environment),
+    perception: stamp("perception", perception),
+    belief: stamp("belief", belief),
+    self: stamp("self", self),
+  };
 }
 
 export function buildJev(input: SitInput, result: EngineResult): JevJudgment[] {
   const kinds = result.gaps.map((g) => g.kind);
   const options = ["observation", "evidence", "context", "objective", "strategic", "representation", "none"];
   const hits = options.filter((o) => o === "none" || kinds.includes(o as (typeof kinds)[number]));
-  const share = hits.length ? 1 / hits.length : 1;
-  const probs = options.map((o) => `${o} ${hits.includes(o) ? round(share) : "0.00"}`).join(", ");
   const top = hits.find((h) => h !== "none") ?? "none";
 
-  const executionIsAcceptance = (input.revealed ?? []).includes("schema-fail") ? 0.06 : has(result.features, "sig:handoff") ? 0.22 : 0.5;
+  const executionIsAcceptance = (input.revealed ?? []).includes("schema-fail") ? "contradicted in simulation" : has(result.features, "sig:handoff") ? "unverified" : "not assessed";
   const stakesScore = input.stakes === "low" ? 1 : input.stakes === "consequential" ? 2 : 3;
 
   return [
@@ -170,14 +168,14 @@ export function buildJev(input: SitInput, result: EngineResult): JevJudgment[] {
       primitive: "choice",
       question: "Which uncertainty kind is live? none is allowed.",
       answer: top,
-      detail: `Local, uncalibrated, not TypeSafe Jev and not Gemini. Probabilities over the closed set: ${probs}. A high peak would not prove that every omission was found.`,
+      detail: `Local, uncalibrated, not TypeSafe Jev and not Gemini. Candidate categories: ${options.filter((o) => hits.includes(o)).join(", ")}. This does not prove that every omission was found.`,
     },
     {
       id: "execution",
       primitive: "noul",
       question: "The reported success establishes that the acceptance criteria were met.",
-      answer: round(executionIsAcceptance),
-      detail: "Noul here is an uncalibrated P(yes), not a boolean. Thresholding it is the caller's job. It is not a TypeSafe Noul.",
+      answer: executionIsAcceptance,
+      detail: "Qualitative local judgment. No calibrated probability or TypeSafe Noul is available.",
     },
     {
       id: "stakes",
@@ -213,7 +211,7 @@ const MODELS: { id: SeatId; name: string; live: boolean }[] = [
   { id: "gemini", name: "Gemini 3.8 Flash", live: false },
   { id: "astra", name: "GPT-6 Astra", live: false },
   { id: "fable", name: "Claude Fable 5.1", live: false },
-  { id: "grok", name: "Grok 4.7", live: true },
+  { id: "grok", name: "Grok role (local procedure)", live: false },
 ];
 
 const STARTING: Record<RoleId, SeatId> = {
@@ -366,7 +364,7 @@ export function buildPerturbations(
   const checks = new Set(input.checks ?? []);
   const revealed = new Set(input.revealed ?? []);
   const irrelevantRan = checks.has("paraphrase");
-  const decisiveRan = revealed.has("schema-fail");
+  const decisiveRan = input.episode === "reviewer" && revealed.has("schema-fail");
   const separable = irrelevantRan && !decisiveRan;
   return {
     irrelevant: {
@@ -384,10 +382,10 @@ export function buildPerturbations(
       ran: decisiveRan,
       held: decisiveRan ? result.features.includes("sig:schema") : null,
       note: decisiveRan
-        ? "The schema check was not in the original packet. After it is revealed, execution and acceptance come apart. That is the decisive change."
-        : input.episode === "reviewer" || result.features.includes("sig:handoff")
-          ? "Not run. The environment may still hold a check the packet does not include."
-          : "This case has no hidden schema defect to reveal.",
+        ? "In this example, a simulated schema failure was revealed. It shows how execution and acceptance can diverge; no user artifact was checked."
+        : input.episode === "reviewer"
+          ? "Not revealed. This demonstration contains a simulated result outside the original packet."
+          : "This case has no simulated hidden schema result to reveal.",
     },
   };
 }
@@ -399,10 +397,15 @@ export function enrich(
 ): EngineResult {
   const full = result as EngineResult;
   const router = chooseRouter(full, input);
+  const records = buildRecords(input, full);
+  const supportIds = records.environment.filter((row) => row.status === "reported" || row.status === "verified_check" || row.status === "simulated").map((row) => row.id);
+  const unresolvedIds = Object.values(records).flat().filter((row) => row.status === "unresolved").map((row) => row.id);
   return {
     ...result,
+    asks: result.asks.map((ask) => ({ ...ask, supportIds, unresolvedIds })),
+    actions: result.actions.map((action) => ({ ...action, supportIds, unresolvedIds })),
     router,
-    records: buildRecords(input, full),
+    records,
     jev: buildJev(input, full),
     hive: buildHive(input, full, router.roles),
     proposals: buildProposals(input),

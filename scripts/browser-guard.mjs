@@ -5,7 +5,8 @@
  * path from argv, so unchecked they will render `file:///root/.grok/auth.json`
  * into a PNG the agent can read, and write it anywhere.
  */
-import { resolve, sep } from "node:path";
+import { existsSync, realpathSync } from "node:fs";
+import { dirname, resolve, sep } from "node:path";
 
 const LOOPBACK_HOSTNAMES = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]);
 
@@ -32,11 +33,26 @@ export function checkedUrl(url) {
 
 /** Absolute `target` if it is strictly inside `allowedDirs`, else exit 1. */
 export function checkedOutputPath(target, allowedDirs, label = "screenshot") {
+  try {
+    return safeOutputPath(target, allowedDirs);
+  } catch {
+    fail(`${label} path must be under ${allowedDirs.join(" or ")}, got ${resolve(target)}`);
+  }
+}
+
+/** Restrict writes to existing canonical directories; reject symlink escapes. */
+export function safeOutputPath(target, allowedDirs) {
   // Resolve first so `..` cannot slip past the prefix check.
   const abs = resolve(target);
-  const allowed = allowedDirs.some((dir) => abs.startsWith(dir.endsWith(sep) ? dir : dir + sep));
+  const allowed = allowedDirs.some((dir) => {
+    const root = realpathSync(dir);
+    if (!abs.startsWith(resolve(dir) + sep)) return false;
+    if (existsSync(abs) && realpathSync(abs) !== abs) return false;
+    const parent = realpathSync(dirname(abs));
+    return parent === root || parent.startsWith(root + sep);
+  });
   if (!allowed) {
-    fail(`${label} path must be under ${allowedDirs.join(" or ")}, got ${abs}`);
+    throw new Error("output outside allowed directory");
   }
   return abs;
 }

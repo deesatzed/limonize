@@ -1,23 +1,16 @@
 import { useState, type FormEvent } from "react";
 import { SAMPLES } from "@/lib/limen/samples";
-import { useLimen, type Draft } from "@/lib/limen/store";
-
-const EMPTY: Draft = {
-  title: "",
-  prose: "",
-  claim: "",
-  objective: "",
-  choice: "",
-  stakes: "consequential",
-  reversible: "partial",
-};
+import { useLimen } from "@/lib/limen/store";
 
 export function SitView() {
   const sit = useLimen((s) => s.sit);
   const sittings = useLimen((s) => s.sittings);
   const situations = useLimen((s) => s.situations);
   const open = useLimen((s) => s.open);
-  const [draft, setDraft] = useState<Draft>(EMPTY);
+  const draft = useLimen((s) => s.draft);
+  const setDraft = useLimen((s) => s.setDraft);
+  const dueCaseIds = useLimen((s) => s.dueCaseIds);
+  const due = dueCaseIds(Date.now());
   const [error, setError] = useState("");
 
   function submit(event: FormEvent) {
@@ -32,17 +25,18 @@ export function SitView() {
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <h1 className="font-serif text-4xl leading-tight text-fg md:text-5xl">What is in front of you?</h1>
+      <h1 className="font-serif text-4xl leading-tight text-fg md:text-5xl">Find what could change this decision.</h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        Write the situation as you currently see it, and the move you are inclined to make. Limen keeps four records
-        and wakes only the roles the next operation needs. A model is not a personality: the starting assignment is an
-        experiment, and a mark can move who holds a role. Only one model can actually be asked.
+        Describe the situation, the goal, and the move you are considering. Limen suggests one useful next check,
+        keeps the evidence behind it visible, and helps you revisit what happened. The roles here are local procedures;
+        external model requests are disabled.
       </p>
 
       <form onSubmit={submit} className="mt-8 space-y-6">
         <label className="block">
           <span className="mb-2 block text-sm text-muted">The situation</span>
           <textarea
+            suppressHydrationWarning
             value={draft.prose}
             onChange={(e) => setDraft({ ...draft, prose: e.target.value })}
             rows={8}
@@ -84,6 +78,7 @@ export function SitView() {
           value={draft.objective}
           onChange={(objective) => setDraft({ ...draft, objective })}
         />
+        <Field label="Case family or project (optional; helps review whether lessons transfer)" value={draft.familyId ?? ""} onChange={(familyId) => setDraft({ ...draft, familyId })} />
 
         <div className="grid gap-4 md:grid-cols-2">
           <Segment
@@ -114,6 +109,8 @@ export function SitView() {
           Sit with this
         </button>
       </form>
+
+      {due.length ? <section className="mt-10 rounded-lg border border-copper p-4"><h2 className="font-serif text-xl">Ready to revisit</h2><p className="mt-2 text-sm text-muted">These local follow-ups are due. You can record an outcome or defer them.</p>{due.map((id) => { const situation = situations.find((s) => s.id === id); const sitting = sittings.find((s) => s.situationId === id); return sitting ? <button key={id} type="button" onClick={() => open(sitting.id)} className="mt-3 block min-h-11 text-left text-copper">{situation?.title ?? "Untitled case"}</button> : null; })}</section> : null}
 
       {sittings.length ? (
         <section className="mt-12 border-t border-line pt-6">
@@ -146,6 +143,7 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
     <label className="block">
       <span className="mb-2 block text-sm text-muted">{label}</span>
       <input
+        suppressHydrationWarning
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="min-h-11 w-full rounded-sm border border-line-strong bg-bg-raised px-3 text-base text-fg"

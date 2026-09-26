@@ -1,0 +1,896 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-26T14:05:54.855Z",
+  "base": {
+    "branch": "main",
+    "head": "c8c89f038bec0d0407123f7a6e1b9089e91b5607",
+    "origin": "https://github.com/deesatzed/limonize.git",
+    "remoteHeads": [
+      "c8c89f038bec0d0407123f7a6e1b9089e91b5607\trefs/heads/main"
+    ]
+  },
+  "runtime": {
+    "node": "v24.13.0",
+    "npm": "11.19.1"
+  },
+  "trackedFoundationEdits": 23,
+  "manifestSelf": {
+    "path": "docs/evidence/luna/foundation-manifest.json",
+    "sha256": "omitted to avoid self-reference"
+  },
+  "included": [
+    {
+      "path": "add2.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "8a2299c37307d85556b796e9e56fdb250908f9a081d16eb7ea2f740cb8e0e5b7"
+    },
+    {
+      "path": "ASSESSMENT_EVIDENCE.json",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "7d3e64c69bed2d9b4f41defd4a9ad39862e3fe4296dea461fdab84cc23148f8f"
+    },
+    {
+      "path": "ASSESSMENT.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "040e7191b706d06ac5ec017eb36f1addd43ab26e415a33cd3d3d0c58b588ad34"
+    },
+    {
+      "path": "CONTINUITY_AND_INTEGRITY_CHARTER.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "38e6077b91eba346c43c242922f278b54833c224e00abbc2e51ad691436f8dbc"
+    },
+    {
+      "path": "DECISIONS.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "f4aba48616546754ffa137b120bd10719142aed1774909b792c42d36ac8a03b0"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/ASSESSMENT.md",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "4e59cc6f3e7d66f23440cd8e92e1a011db48d0db436276c86efc364317850715"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/EVIDENCE.json",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "b6c107d439edb71c68c1d52cdfd2d9beb47935c70b48a4d5cf43e7ebc4d24f31"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/probe-results.json",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "ae70c255ce4169b9137d67334370126259287d91428aa42dd73ddac87d64a22b"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/probe.py",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "7be8b5c8d5f9d18bc3bad2be5bc5cae58b0b6acb28c40726cef537087fafd85f"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/replay-model-id-diagnostic.json",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "7cbcc00af80cb535950b9928652a10b14309b27eeddbc7fc3cf94773020ae08e"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/REPO_MAP.md",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "d5d362bf8ebc5d71c28685a473b3277a6e6d174a5050b58f1469ee346a16c4ec"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/RISK_NOTES.md",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "c8303226718d73a046ce5866193ffb317b80653ef4b9af5bd6747163b029989e"
+    },
+    {
+      "path": "docs/assessments/hive-lineage-2026-09-25/source-manifest.json",
+      "state": "??",
+      "category": "frozen-hive-lineage-assessment",
+      "sha256": "49a9fc0a2f6f47b166ea9ba89252546463ac27b42322cf6eb18a71866c7a041a"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/build.log",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "a67733f47ee07b2e61fa78296da0e75ddc2cdfbb4c182a3de08c520f2de51f08"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/charter-check.log",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "5c9cdedc7945786a38efebda04830fe7f58a060603a98a762ea1e7800da6000a"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/checks.json",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "9ac31dbe2b41d545b500d17023f59300a912e2c4591744a83daa90e6d9eb2c35"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/diff-check.log",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/eval.log",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "96d7585b498f5dceb73673d0ef1777298f538aedca2bd8d3f2c3cb2c95baa797"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/limen-evaluation.json",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "507342eca85ad47236026cd95e89f9f6893554ac503c8023e6d52a1529ebde94"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/limen-evaluation.md",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "5af454d19e72c71d938d9fec86896a0857364c7cbc01d6116e4b00e24e6d43b6"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/lint.log",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "b936abfefef25d5e5df6d3cf22f9c47bdbe3d5199b0917b5aa280965a10b8d45"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/npm-test.log",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "ec0836c9dad2835582f0dbb927470cb8016953db051883adebd436fc4d9a8ed4"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/README.md",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "0bab1212fcfc6b20e387f4ebb384ebe31374ca1628edb777837712e4f9393398"
+    },
+    {
+      "path": "docs/evidence/luna/foundation/typecheck.log",
+      "state": "??",
+      "category": "Luna-run-evidence",
+      "sha256": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500"
+    },
+    {
+      "path": "docs/plans/2026-09-23-autonomous-development-design.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "a1bcc6ba825d41f3dbacb5cfad31dfc0cb66304d40098be74ae47b8cb8cb7a35"
+    },
+    {
+      "path": "docs/plans/2026-09-23-autonomous-development-plan.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "3573016e516c5727ca6dcafead8c139bfde978d34d2680fa4cc278236a546d39"
+    },
+    {
+      "path": "docs/plans/2026-09-26-luna-execution.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "74571ab92bce05905344e7b28d05f5f7e85ce5ee07ed4c33a6c0d5023fbdc200"
+    },
+    {
+      "path": "ENHANCEMENT_REPORT.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "0d1ab5c69ed4202b20afdc03b76a14bbbdda7f77b38a8e82d0e784c739e219e6"
+    },
+    {
+      "path": "evaluation/baseline/engine.ts",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "1d5e57634e3beba9b5428400881c50355570cede4ba21fa79c1038c4cdc7b9d4"
+    },
+    {
+      "path": "evaluation/baseline/enrich.ts",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "7cc7f3a07c5ae1335531d1d8ef61674e3bc0a6380661c74a618e3076daf988fc"
+    },
+    {
+      "path": "evaluation/baseline/fly.ts",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "24e744e63c57499361ed41b6ca83df561a0bd3c201b17f445a75c125fa686207"
+    },
+    {
+      "path": "evaluation/baseline/samples.ts",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "6ce620ed775e5484a8c8335dd4545013f3c641c78f7c3933aa07f5be9db63503"
+    },
+    {
+      "path": "evaluation/baseline/store-types.ts",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "f0e589310bd3c6592336af4dcfce4a188da51f8ea628e0f8523d16dad07ae927"
+    },
+    {
+      "path": "evaluation/baseline/types.ts",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "64c1915511a1be2a8e88bf227a510716af7156de3d97d2dfd93cb0cb2cd39b50"
+    },
+    {
+      "path": "evaluation/limen/fixtures.mjs",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "65095d265d8062b2f36afac69395428eb3c64b3f5150a86b440685c2238b1cad"
+    },
+    {
+      "path": "evaluation/limen/results/latest.json",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "f33657ade396e949dc79481527ce5c4037e37760af5c4771e7fe5c675be69f83"
+    },
+    {
+      "path": "evaluation/limen/results/latest.md",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "e6b97f2f0aa2caf3024e356720900c06d1856a1440aea2ddc2bc5238dc3bd39e"
+    },
+    {
+      "path": "evaluation/limen/run.mjs",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "dc0922703dbf5f357209ed1a08833dc0a1db07198bd692da63b2057422bdbbf8"
+    },
+    {
+      "path": "evaluation/limen/scorer.mjs",
+      "state": "??",
+      "category": "baseline-and-synthetic-evaluation",
+      "sha256": "7e907759ad84c0f2f4af3dd118f1757588d07a09eee2e34e6585c3e9a39b57f2"
+    },
+    {
+      "path": "GOAL_ENHANCE.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "e10a9e7721d9c428a1df9a970234e65275c69ef0b9d2de0fbd3472694b4a157e"
+    },
+    {
+      "path": "GOAL_LUNA.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "81d082ea35330e552a645d9a318b7ddb25ac319b62b0f7f16dd9db83ffa3a1bc"
+    },
+    {
+      "path": "IMPLEMENT.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "5442ab2a8964ca8f103d7b3792c3950d5de17b0671701a7aa11a04f676252f41"
+    },
+    {
+      "path": "package.json",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "d64562008af1a0f074a0f4a2694f8c1c3ec33bf1b0c608871c016c91448cc66a"
+    },
+    {
+      "path": "PROGRESS.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "b0f28b44a0ef61f130ef2aab32176a651fa8deb7406c19d41098ef272cd3ceeb"
+    },
+    {
+      "path": "README.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "e484097a4335410881612515eb9bf0e71b8f7f8ac1bf2e9b0eb97710c9e9d0ec"
+    },
+    {
+      "path": "REPO_MAP.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "f0c2196895615b8c096e8819506f4f551abb92320438d12c16bb568565fc3140"
+    },
+    {
+      "path": "RISK_NOTES.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "294614ecae4f6188ebdf6514f2b844a7fddcc3387530b1b8f7ca4353349a85da"
+    },
+    {
+      "path": "screenshots/charter-built-desktop-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "7121ac89df071c27d5fb26c9fe7d525936353c6b8326b65e25c1da6a4be845b5"
+    },
+    {
+      "path": "screenshots/charter-built-desktop.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "f0428d99ebe7c0049641a0db6d4a3b3d0c9368fd6dfdc41407cf69f04678c910"
+    },
+    {
+      "path": "screenshots/charter-built-flow.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "87068e26e1224e65345efa9f23c70b36b88bd197b6c16a8bde8e41cccaeedf34"
+    },
+    {
+      "path": "screenshots/charter-built-mobile-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "8d25539c9ca6ab649820fb76dba5ee3ef849ff2aed027d41990816abd476c241"
+    },
+    {
+      "path": "screenshots/charter-built-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "009d21b20b0fb656d5033936465f4853824dc842eca5ba466223504a25b7cd02"
+    },
+    {
+      "path": "screenshots/charter-built-self-desktop-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "7121ac89df071c27d5fb26c9fe7d525936353c6b8326b65e25c1da6a4be845b5"
+    },
+    {
+      "path": "screenshots/charter-built-self-desktop.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "f0428d99ebe7c0049641a0db6d4a3b3d0c9368fd6dfdc41407cf69f04678c910"
+    },
+    {
+      "path": "screenshots/charter-built-self-mobile-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "8d25539c9ca6ab649820fb76dba5ee3ef849ff2aed027d41990816abd476c241"
+    },
+    {
+      "path": "screenshots/charter-built-self-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "63fef9142c51689193274221e21312378d6f8bd4a1b430d6f21c9246c8194ecd"
+    },
+    {
+      "path": "screenshots/charter-built.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "72500e838abcf53f34f090257e18dab7f7bcffe3fcad1d91d0e4c32ac3c65bd8"
+    },
+    {
+      "path": "screenshots/charter-built.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "44fb685f09f793f5d4ea784d04839590d2068c102c514c0585ebb8384ff46347"
+    },
+    {
+      "path": "screenshots/charter-dev-desktop-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "7121ac89df071c27d5fb26c9fe7d525936353c6b8326b65e25c1da6a4be845b5"
+    },
+    {
+      "path": "screenshots/charter-dev-desktop.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "cae86652b8e6709cdaf1814dfbad4b1b475e10b28f98e0bc871fd223f31713a1"
+    },
+    {
+      "path": "screenshots/charter-dev-flow.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "58d00feb5916b056e560898f2a4ca83c24bf9464d4629d61756c17c7daac1140"
+    },
+    {
+      "path": "screenshots/charter-dev-mobile-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "8d25539c9ca6ab649820fb76dba5ee3ef849ff2aed027d41990816abd476c241"
+    },
+    {
+      "path": "screenshots/charter-dev-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "009d21b20b0fb656d5033936465f4853824dc842eca5ba466223504a25b7cd02"
+    },
+    {
+      "path": "screenshots/charter-dev-self-desktop-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "7121ac89df071c27d5fb26c9fe7d525936353c6b8326b65e25c1da6a4be845b5"
+    },
+    {
+      "path": "screenshots/charter-dev-self-desktop.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "cae86652b8e6709cdaf1814dfbad4b1b475e10b28f98e0bc871fd223f31713a1"
+    },
+    {
+      "path": "screenshots/charter-dev-self-mobile-expanded.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "8d25539c9ca6ab649820fb76dba5ee3ef849ff2aed027d41990816abd476c241"
+    },
+    {
+      "path": "screenshots/charter-dev-self-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "63fef9142c51689193274221e21312378d6f8bd4a1b430d6f21c9246c8194ecd"
+    },
+    {
+      "path": "screenshots/charter-dev.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "490070b608b5ac1924ae03cc65607c266612daf968c5a0f8ef6a2ae0d5895007"
+    },
+    {
+      "path": "screenshots/charter-dev.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "44fb685f09f793f5d4ea784d04839590d2068c102c514c0585ebb8384ff46347"
+    },
+    {
+      "path": "screenshots/enhance-final-built-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "009d21b20b0fb656d5033936465f4853824dc842eca5ba466223504a25b7cd02"
+    },
+    {
+      "path": "screenshots/enhance-final-built.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "5081e19e0351e2397d8a08fe62294462b494d6172ba73d33a6ce36f7ceecb31a"
+    },
+    {
+      "path": "screenshots/enhance-final-built.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "44fb685f09f793f5d4ea784d04839590d2068c102c514c0585ebb8384ff46347"
+    },
+    {
+      "path": "screenshots/enhance-final-dev-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "009d21b20b0fb656d5033936465f4853824dc842eca5ba466223504a25b7cd02"
+    },
+    {
+      "path": "screenshots/enhance-final-dev.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "6e8595d4c84296fe927da83e49d8c198c0cbd4331f6efe43721c4ff692f304c6"
+    },
+    {
+      "path": "screenshots/enhance-final-dev.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "44fb685f09f793f5d4ea784d04839590d2068c102c514c0585ebb8384ff46347"
+    },
+    {
+      "path": "screenshots/enhance-flow-built-memory.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "994d7898dc627a7a4f14026bc15b4027b11de0384cde86547f826e943162ec45"
+    },
+    {
+      "path": "screenshots/enhance-flow-built-mind-desktop.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "d639b12f7d5236bf94a156980a75bb52801bf1eccd398c89d51cf90d89d2035d"
+    },
+    {
+      "path": "screenshots/enhance-flow-built-mind-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "0437ce713bc84fe9b2e577b7200c162db6661e4de6c9d2f4afbc18298aef2e67"
+    },
+    {
+      "path": "screenshots/enhance-flow-built.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "51b37370398cfd1aec281b80770dd444262b12e532bc6ff41a7cf4a5aff94d52"
+    },
+    {
+      "path": "screenshots/enhance-flow-dev-memory.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "5e2f3f44c232e272fc67e06742b684dd3241836e99a7bee9a51df9e31531c41f"
+    },
+    {
+      "path": "screenshots/enhance-flow-dev-mind-desktop.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "d639b12f7d5236bf94a156980a75bb52801bf1eccd398c89d51cf90d89d2035d"
+    },
+    {
+      "path": "screenshots/enhance-flow-dev-mind-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "0437ce713bc84fe9b2e577b7200c162db6661e4de6c9d2f4afbc18298aef2e67"
+    },
+    {
+      "path": "screenshots/enhance-flow-dev.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "51b37370398cfd1aec281b80770dd444262b12e532bc6ff41a7cf4a5aff94d52"
+    },
+    {
+      "path": "screenshots/luna-foundation-built-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "009d21b20b0fb656d5033936465f4853824dc842eca5ba466223504a25b7cd02"
+    },
+    {
+      "path": "screenshots/luna-foundation-built.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "b624ab595c5e0db9a59ff6da1dc530b311ddfeb1df947effeedae89727cfb56a"
+    },
+    {
+      "path": "screenshots/luna-foundation-built.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "44fb685f09f793f5d4ea784d04839590d2068c102c514c0585ebb8384ff46347"
+    },
+    {
+      "path": "screenshots/luna-foundation-dev-mobile.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "009d21b20b0fb656d5033936465f4853824dc842eca5ba466223504a25b7cd02"
+    },
+    {
+      "path": "screenshots/luna-foundation-dev.json",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "f754575aab484a9a059135feeaa5919c2bda8feb40e61022c5190e383834c20a"
+    },
+    {
+      "path": "screenshots/luna-foundation-dev.png",
+      "state": "??",
+      "category": "selected-charter-enhancement-and-Luna-browser-evidence",
+      "sha256": "44fb685f09f793f5d4ea784d04839590d2068c102c514c0585ebb8384ff46347"
+    },
+    {
+      "path": "scripts/browser-guard.mjs",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "afb2371063a75456f88a8d0c37ec78e1359ad269f87a9158dcd72add5a3eb77e"
+    },
+    {
+      "path": "scripts/browser-guard.test.mjs",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "722cfaa5dd5ce608d0d41988ed9c47e1e894aac5c097a8db38b943ea4e6027b7"
+    },
+    {
+      "path": "scripts/browser-smoke-verdict.mjs",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "17106f5ac9794f19c8ddf60178cd7ae78de72136e9569c5ca1a279eb7a715f49"
+    },
+    {
+      "path": "scripts/browser-smoke-verdict.test.mjs",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "cc91e01fc0c175a35305f8796a4a51ce7aae3cdb04f0c60a007246db0156314b"
+    },
+    {
+      "path": "scripts/browser-smoke.mjs",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "73316d423d4f2356f36768a667948954426662f66fe1904f2b4aae4ed90a25df"
+    },
+    {
+      "path": "scripts/grok-pwa-plugin.test.mjs",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "f1aea0f4caacfb8b0fed1efead828890f48f1baf72bbaaf621c7c20693ae0b0a"
+    },
+    {
+      "path": "scripts/limen-charter-smoke.mjs",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "018e35eb444508931c3c62eb1fff75c183e7ac84acd72742abf0b1ab1c80a8f8"
+    },
+    {
+      "path": "scripts/limen-charter.mjs",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "aa08c9b17c77fc42d81a480b7ce163c8a0db397eb48fe6d4c61fea0189d5e2b2"
+    },
+    {
+      "path": "scripts/limen-flow-smoke.mjs",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "c1e5bce8e82cd564b717668fde0e8b17820379e481a2e02017ed26ff3b294ad6"
+    },
+    {
+      "path": "scripts/resolve-ts.mjs",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "33e1d8bb0e48586c8691b7f047443fd3816f5f4bfd4fd94e71b7f3143618384b"
+    },
+    {
+      "path": "src/components/limen/app.tsx",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "bb652cb0df184955f2f50d93731344d901eb6200cf429a3c983121a4d47ab3a0"
+    },
+    {
+      "path": "src/components/limen/charter-panel.tsx",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "a2808345742133ccf332038694055cf5f69b37350ef4c0c67ee749df0b362531"
+    },
+    {
+      "path": "src/components/limen/data-controls.tsx",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "bf5c115e07644d62b773352cab3a1e5859674a63565c65f25931f231b746e94f"
+    },
+    {
+      "path": "src/components/limen/ledger-view.tsx",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "2dc6f872a0528c46d6b7f99ed4a859386424a5687405cc34ab01fd2de47b5583"
+    },
+    {
+      "path": "src/components/limen/mind-view.tsx",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "469f7feae22b430b6821f4239c7be54601c81cdba826c75876c4f38631820af9"
+    },
+    {
+      "path": "src/components/limen/outcome-panel.tsx",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "061af597083e3acc29c70267b706078afcaeb92a2462a8079ea65d1347009281"
+    },
+    {
+      "path": "src/components/limen/self-view.tsx",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "6538410addd55b9fb59494a391dd3a1769b9b820f03a4fdeef531abfb32d1380"
+    },
+    {
+      "path": "src/components/limen/sit-view.tsx",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "0ea76ed5d973258577b9e5b56c3d99c13c868d42ac6815edd4813d9bac0f2309"
+    },
+    {
+      "path": "src/lib/app-data/client.server.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "ebb21379faa7e4caa189c8ae73d8c60ce5f49f244c0905656b4ddcd691ac70b8"
+    },
+    {
+      "path": "src/lib/auth/use-current-user.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "5b05e49493c1dc52f5eff471ac52918399bda8d472ba791ec5cd813236d04d6d"
+    },
+    {
+      "path": "src/lib/limen/charter.test.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "0aa5f8fd812cb8301f03243f1f3d0005d16b1858a6ec147ce3e0efb66074ce65"
+    },
+    {
+      "path": "src/lib/limen/charter.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "3b2aea5f5404ba258369d0a2a524affc9cd8102885f24553bc6db0de89c7e13f"
+    },
+    {
+      "path": "src/lib/limen/check.test.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "30b7535d2ef63c227042fcd989c504e05a9549b973b61cb99cc5ef31fdaf743b"
+    },
+    {
+      "path": "src/lib/limen/check.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "c770367cbc551c0e3ce6bc39f9cf430b033827cf4ab849a32280a04bf2af6150"
+    },
+    {
+      "path": "src/lib/limen/data.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "9e6ee3ef79964d5d3e23beba0a0cc42dded35481b15c3cfe5eb7dc2c8d3f229e"
+    },
+    {
+      "path": "src/lib/limen/engine.test.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "37cbe56a3111e7dad6892dfa43d4bb52803364d4740ac01dd842a28470f0c5cd"
+    },
+    {
+      "path": "src/lib/limen/engine.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "cb7c214520ecd4c9e4b58b3f8131d50f178bf5e4350a0bbf161d2dd15db0dc86"
+    },
+    {
+      "path": "src/lib/limen/enrich.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "50fe48f0874b787b12c09b28419d8b2773a49095dab670a07b3f9d542cb9aec7"
+    },
+    {
+      "path": "src/lib/limen/fly.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "1a3e59cc34328fe9fd8ad619c2d87d2c158ea0aaea92659ad3436c7cc01fd591"
+    },
+    {
+      "path": "src/lib/limen/interpret.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "fd35728667e0cc8894a2161a3ba321bbf32a4e8246d41b7bdb0572c46a35e71f"
+    },
+    {
+      "path": "src/lib/limen/ledger.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "40edb74c9032119f07183059a5c1cfe979853e48d070ac04ba053d2b61c08b43"
+    },
+    {
+      "path": "src/lib/limen/memory.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "5c22142fa93b802aa84336c905c6b9fd3c48da0077585b5e3f872e04ce7e1458"
+    },
+    {
+      "path": "src/lib/limen/provider-protocol.test.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "72b97b40ed21dace0b1105c4c8dd8f1293f3a957d8f7ddd5e1947c0cfb270494"
+    },
+    {
+      "path": "src/lib/limen/provider-protocol.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "59eb56d207e4048fa00add2ccf210d63dfb895b16c060480112d4cd85b93f828"
+    },
+    {
+      "path": "src/lib/limen/reflect.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "8bf12c4dcb053ceef77b12d26a23971326950890cd0661fcd383e74e36159dc6"
+    },
+    {
+      "path": "src/lib/limen/storage.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "4717b6c8db25ceb40098753d8d80ebccd0a3bd70f7fa19cc0724df8750c92f9d"
+    },
+    {
+      "path": "src/lib/limen/store-types.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "cb511a7932b32c21d8d0d6be2d6848daecaa3cccd9a2e8499df974c10fcc40f8"
+    },
+    {
+      "path": "src/lib/limen/store.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "fed2349ac12e7206c371b7be9af1697dc4839f58ffcc120ecceba2c401743993"
+    },
+    {
+      "path": "src/lib/limen/types.ts",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "883c48c2590232d2d199dc40efeeb0c1da397c94e29f5bce7b63e720771acd8e"
+    },
+    {
+      "path": "src/lib/limen/workflow.test.ts",
+      "state": "??",
+      "category": "application-source-and-tests",
+      "sha256": "a3198198b193e8f89cf900ec25a58420865622c92ef905bed532bec902654daf"
+    },
+    {
+      "path": "startup.sh",
+      "state": " M",
+      "category": "application-source-and-tests",
+      "sha256": "094c24aa8e01c316fa1fcdaf381378776d149007d0f0de8e2c95e42ad513d956"
+    },
+    {
+      "path": "TASK_QUEUE.md",
+      "state": "??",
+      "category": "project-truth-and-goal-documents",
+      "sha256": "2c8cd5fae668fbe9935e20d06eb54c32eb3943f2acd7d22566c2338369846416"
+    }
+  ],
+  "excluded": [
+    {
+      "state": "??",
+      "path": ".DS_Store",
+      "reason": "incidental macOS metadata; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "docs/.DS_Store",
+      "reason": "incidental macOS metadata; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "evaluation/.DS_Store",
+      "reason": "incidental macOS metadata; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/charter-dev-flow-failure.png",
+      "reason": "failed or redundant exploratory flow screenshot; final passing flow and report retained locally and in worktree"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-flow-built-after-delete.png",
+      "reason": "failed or redundant exploratory flow screenshot; final passing flow and report retained locally and in worktree"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-flow-desktop.png",
+      "reason": "failed or redundant exploratory flow screenshot; final passing flow and report retained locally and in worktree"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-flow-dev-after-delete.png",
+      "reason": "failed or redundant exploratory flow screenshot; final passing flow and report retained locally and in worktree"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-flow-dev-failure.png",
+      "reason": "failed or redundant exploratory flow screenshot; final passing flow and report retained locally and in worktree"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-flow-failure.png",
+      "reason": "failed or redundant exploratory flow screenshot; final passing flow and report retained locally and in worktree"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-flow.json",
+      "reason": "legacy or exploratory screenshot outside the selected foundation proof set; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-g0-preview-mobile.png",
+      "reason": "legacy or exploratory screenshot outside the selected foundation proof set; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-g0-preview.json",
+      "reason": "legacy or exploratory screenshot outside the selected foundation proof set; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-g0-preview.png",
+      "reason": "legacy or exploratory screenshot outside the selected foundation proof set; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-mid-dev-mobile.png",
+      "reason": "legacy or exploratory screenshot outside the selected foundation proof set; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-mid-dev.json",
+      "reason": "legacy or exploratory screenshot outside the selected foundation proof set; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "screenshots/enhance-mid-dev.png",
+      "reason": "legacy or exploratory screenshot outside the selected foundation proof set; preserve locally"
+    },
+    {
+      "state": "??",
+      "path": "src/.DS_Store",
+      "reason": "incidental macOS metadata; preserve locally"
+    }
+  ]
+}

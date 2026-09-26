@@ -113,7 +113,7 @@ test("reviewer handoff treats resistance as a belief until the schema check", ()
   assert.ok(before.features.includes("sig:handoff"));
   assert.ok(!before.features.includes("sig:schema"));
   assert.ok(before.records.belief.some((item) => item.status === "inferred" && /resist/i.test(item.text)));
-  assert.ok(!before.records.belief.some((item) => item.status === "observed" && /resist/i.test(item.text)));
+  assert.ok(!before.records.belief.some((item) => item.status === "verified_check" && /resist/i.test(item.text)));
   assert.ok(!before.records.environment.some((item) => /outdated schema/i.test(item.text)));
   assert.equal(before.hive.length, 4);
   assert.equal(new Set(before.hive.map((seat) => seat.roleId)).size, 4);
@@ -122,7 +122,7 @@ test("reviewer handoff treats resistance as a belief until the schema check", ()
   assert.equal(before.hive.find((seat) => seat.roleId === "perception")?.id, "gemini");
   assert.equal(before.hive.find((seat) => seat.roleId === "boundary")?.id, "grok");
   assert.equal(before.hive.find((seat) => seat.roleId === "boundary")?.starting, true);
-  assert.equal(before.hive.filter((seat) => seat.live).length, 1);
+  assert.equal(before.hive.filter((seat) => seat.live).length, 0);
   assert.match(before.jev.map((item) => item.detail).join(" "), /not TypeSafe/i);
   assert.equal(before.router.op, "check_source");
   assert.equal(before.perturbations.decisive.ran, false);
@@ -140,9 +140,9 @@ test("reviewer handoff treats resistance as a belief until the schema check", ()
   );
   assert.equal(learned.hive.find((seat) => seat.roleId === "boundary")?.id, "astra");
   assert.equal(learned.hive.find((seat) => seat.roleId === "boundary")?.starting, false);
-  assert.equal(learned.router.op, "stop");
-  assert.equal(learned.router.fromLearning, true);
-  assert.equal(learned.hive.filter((seat) => seat.active).length, 0);
+  assert.equal(learned.router.op, "check_source");
+  assert.equal(learned.router.fromLearning, false);
+  assert.equal(learned.hive.filter((seat) => seat.active).length, 2);
 
   const after = runEngine(
     input({
@@ -155,7 +155,7 @@ test("reviewer handoff treats resistance as a belief until the schema check", ()
   );
   assert.ok(after.features.includes("sig:schema"));
   assert.match(after.voice, /schema|acceptance|motive/i);
-  assert.ok(after.records.environment.some((item) => item.status === "observed" && /outdated schema/i.test(item.text)));
+  assert.ok(after.records.environment.some((item) => item.status === "simulated" && /outdated report schema/i.test(item.text)));
   assert.ok(after.actions.some((action) => action.id === "keep-failure"));
   assert.equal(after.router.op, "check_source");
   assert.ok(after.proposals.some((proposal) => proposal.id === "completion-semantics"));

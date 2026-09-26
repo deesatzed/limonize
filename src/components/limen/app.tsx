@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Eye, Library, PenLine, ScanSearch } from "lucide-react";
 import { idleLines, useLimen } from "@/lib/limen/store";
 import type { ViewId } from "@/lib/limen/types";
+import { storageIssue } from "@/lib/limen/storage";
 import { LedgerView } from "./ledger-view";
 import { MindView } from "./mind-view";
 import { SelfView } from "./self-view";
@@ -15,8 +16,12 @@ const NAV: { id: ViewId; label: string; icon: typeof Eye }[] = [
 ];
 
 export function LimenApp() {
+  const [issue, setIssue] = useState<string | null>(null);
   useEffect(() => {
-    void useLimen.persist.rehydrate();
+    const refresh = () => setIssue(storageIssue());
+    window.addEventListener("limen-storage-issue", refresh);
+    void Promise.resolve(useLimen.persist.rehydrate()).catch(refresh).finally(refresh);
+    return () => window.removeEventListener("limen-storage-issue", refresh);
   }, []);
 
   const view = useLimen((s) => s.view);
@@ -27,10 +32,11 @@ export function LimenApp() {
   const blindspots = useLimen((s) => s.blindspots);
   const ruleStats = useLimen((s) => s.ruleStats);
   const engrams = useLimen((s) => s.engrams);
+  const feedbackEvents = useLimen((s) => s.feedbackEvents);
   const activeId = useLimen((s) => s.activeSittingId);
   const lines = useMemo(
-    () => idleLines({ sittings, situations, memories, blindspots, ruleStats, engrams }),
-    [sittings, situations, memories, blindspots, ruleStats, engrams],
+    () => idleLines({ sittings, situations, memories, blindspots, ruleStats, engrams, feedbackEvents }),
+    [sittings, situations, memories, blindspots, ruleStats, engrams, feedbackEvents],
   );
   const attention = sittings.find((x) => x.id === activeId)?.result.attention ?? "quiet";
 
@@ -69,6 +75,7 @@ export function LimenApp() {
             </span>
           </header>
           <main className="px-5 py-6 md:px-10 md:py-10">
+            {issue ? <div role="alert" className="mb-5 rounded-lg border border-copper p-4 text-sm text-copper">Browser storage needs recovery: {issue}. Open Self → Your local data to export the original value or recover deliberately.</div> : null}
             {view === "sit" ? <SitView /> : null}
             {view === "mind" ? <MindView /> : null}
             {view === "ledger" ? <LedgerView /> : null}

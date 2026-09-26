@@ -1,0 +1,51 @@
+# Enhancement task queue
+
+Implementation and local verification of the six-enhancement contract are complete on the current working tree. Evidence and limitations are in [PROGRESS.md](PROGRESS.md) and [ENHANCEMENT_REPORT.md](ENHANCEMENT_REPORT.md). No commit, push or deployment is implied.
+
+| ID | Acceptance focus | Dependency | Status | Evidence |
+|---|---|---|---|---|
+| G0 | Baseline, normal gates, portable startup/smoke, frozen engine and schema | none | done | `evaluation/baseline/`, `IMPLEMENT.md`, final commands |
+| E1/G1 | Evidence origin, deterministic check receipts, simulated demo, safe routing | G0 | done | `check.test.ts`, `engine.test.ts`, `workflow.test.ts` |
+| E2/G2 | Immutable runs, event feedback, idempotency, response attribution | E1 | done | `workflow.test.ts`, `provider-protocol.test.ts` |
+| E3/G3 | Chosen action, expectation, follow-up, outcome and correction | E2 | done | `workflow.test.ts`, `screenshots/enhance-flow-*.json` |
+| E4/G4 | Conservative source readings and honest synthetic comparison | G0, E1 | done | `engine.test.ts`, `evaluation/limen/results/latest.*` |
+| E5/G5 | Distinct outcome-backed promotion and conditional reuse | E3, E4 | done | `workflow.test.ts`, `screenshots/enhance-flow-*.json` |
+| E6/G6 | Simple Mind, versioned local data, migration, import/export, deletion, recovery, disabled provider | E1–E5 | done | `workflow.test.ts`, browser flow, dev/built smoke |
+| G7 | Final normal commands and fresh dev/built desktop/mobile browser proof | G1–G6 | done | `PROGRESS.md` integrated verification, `ENHANCEMENT_REPORT.md` |
+
+## Continuity and integrity integration — 2026-09-25
+
+This is a separate completed local change following the six enhancements. Governing text: [CONTINUITY_AND_INTEGRITY_CHARTER.md](CONTINUITY_AND_INTEGRITY_CHARTER.md). Evidence: [PROGRESS.md](PROGRESS.md), charter integration entry.
+
+| ID | Acceptance focus | Status | Evidence |
+|---|---|---|---|
+| C1 | One versioned governing charter in the app and Markdown; document drift fails normal tests | done | `charter.ts`, `scripts/limen-charter.mjs`, Self disclosure, `npm test` |
+| C2 | Persistent learned-influence pause; import/hydration cannot replace controls; external requests disabled | done | `charter.test.ts`, store/data/storage, `charter-*-flow.json` |
+| C3 | Deletion removes copied lesson and recall content, invalidates support and labels redaction | done | `charter.test.ts`, store deletion, Mind retention note |
+| C4 | Charter integrated into development plan; typecheck/lint/tests/build and dev/built browser gates pass | done | plan/design, `PROGRESS.md`, `screenshots/charter-*.json` |
+
+## Autonomous development — planned
+
+[A0–A11](docs/plans/2026-09-23-autonomous-development-plan.md) remain proposed implementation work. The agreed direction includes both real and simulated experience, context-sensitive automatic/advisory behavior and autonomous reversible policy development. Charter integration supplies boundaries and current controls; it does not implement the expectation/competence/commitment cycle or establish its benefit.
+
+## Luna execution goal — prepared, not started
+
+[GOAL_LUNA.md](GOAL_LUNA.md) is the user-requested execution contract for the next milestone. Follow [the runbook](docs/plans/2026-09-26-luna-execution.md) sequentially when invoked. Publication is to the goal branch; no main merge or deployment is included.
+
+| Task | Work | Status |
+|---|---|---|
+| L00 | Inventory and recovery baseline | done — manifest written from the live dirty tree |
+| L01 | Verify, commit and push existing foundation | in progress — local gates pass; branch checkpoint and publication pending |
+| L02 | Typed development contract and replay | queued |
+| L03 | Expectations and attributed resolution | queued |
+| L04 | v3 persistence, control preservation and deletion | queued |
+| L05 | Sequential worlds, separate scorer and frozen controls | queued |
+| L06 | Evidence-derived competence and candidate commitments | queued |
+| L07 | Reviewed admission and coherent selection | queued |
+| L08 | Bounded autonomous queue and recovery | queued |
+| L09 | Integrated product and rehearsal flow | queued |
+| L10 | Comparative evaluation and scope disposition | queued |
+| L11 | Final tests/build/browser proof | queued |
+| L12 | Report, commit, push and remote verification | queued |
+
+These tasks implement a bounded slice of the wider development roadmap. Record partial A-task coverage explicitly; do not mark all A0–A11 done when this milestone completes.

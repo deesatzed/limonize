@@ -14,7 +14,7 @@ const IDENTITY_PREFIX_LEN = 64;
 export function bodyTextPrefix(text) {
   return normalizeBodyText(text).slice(0, IDENTITY_PREFIX_LEN);
 }
-export function parseSmokeArgs(argv, env = {}) {
+export function parseSmokeArgs(argv, env = {}, defaultOutput = "/workspace/screenshots/app-builder-preview.png") {
   const positional = [];
   let baseline = env.BROWSER_SMOKE_BASELINE || "";
   for (let i = 0; i < argv.length; i++) {
@@ -35,7 +35,7 @@ export function parseSmokeArgs(argv, env = {}) {
   }
   return {
     url: positional[0] || "http://127.0.0.1:8080/",
-    outPng: positional[1] || "/workspace/screenshots/app-builder-preview.png",
+    outPng: positional[1] || defaultOutput,
     baseline,
   };
 }

@@ -1,0 +1,60 @@
+{
+  "scope": "read-only source assessment; local scripted probes; no live provider execution",
+  "python_runtime_command": "/Volumes/WS4TB/Movie_SentientMe/hive-lineage-sim/engine/.venv/bin/python",
+  "unit_test_command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<snapshot>/engine/src <python> -m pytest tests -q -p no:cacheprovider --basetemp=<temporary-directory>",
+  "unit_tests": {
+    "snapshot_passed": 54,
+    "failed": 0,
+    "exit_code": 0,
+    "duration_seconds": 0.11
+  },
+  "replay_cli": {
+    "exit_code": 1,
+    "suite": "RED",
+    "failures": [
+      {
+        "fixture": "turn1_baseline",
+        "kind": "KeyError: No recording"
+      },
+      {
+        "fixture": "turn2_sharpened",
+        "kind": "KeyError: No recording"
+      },
+      {
+        "fixture": "turn3b_unverified_assertion",
+        "kind": "KeyError: No recording"
+      },
+      {
+        "fixture": "turn3a_flip_condition_met",
+        "kind": "KeyError: No recording"
+      }
+    ],
+    "cause": "replay runner uses model ID replay; recording key includes actual model ID"
+  },
+  "recording_inventory": {
+    "records": 12,
+    "unique_keys": 12,
+    "models": {
+      "z-ai/glm-5.3-prime": 8,
+      "aion-labs/aion-3.5": 4
+    },
+    "fields": [
+      "key",
+      "model",
+      "response"
+    ],
+    "provenance_limit": "existing response file; live capture not independently reproduced"
+  },
+  "additional_probes": [
+    "probe-results.json",
+    "replay-model-id-diagnostic.json"
+  ],
+  "not_run": [
+    "live provider calls",
+    "provider model availability checks",
+    "donor build/install",
+    "production deployment"
+  ],
+  "limen_product_source_changed": false,
+  "donor_source_changed_by_assessment": false
+}

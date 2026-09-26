@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { reflectFurther } from "@/lib/limen/reflect";
 import { useLimen } from "@/lib/limen/store";
+import { effectiveFeedback } from "@/lib/limen/ledger";
+import { EXTERNAL_REFLECTION_DISABLED } from "@/lib/limen/charter";
+import { OutcomePanel } from "./outcome-panel";
 import type {
   Answer,
   EvidenceItem,
@@ -40,11 +42,12 @@ const LEVEL_LABEL = {
 };
 
 const STATUS_LABEL: Record<EvidenceStatus, string> = {
-  observed: "Observed",
+  reported: "Reported",
   inferred: "Inferred",
   assumed: "Assumed",
   simulated: "Simulated",
   unresolved: "Unresolved",
+  verified_check: "Checked",
 };
 
 const OP_LABEL: Record<FlyOp, string> = {
@@ -68,7 +71,7 @@ const RECORD_LABEL: { key: keyof FourRecords; title: string; hint: string }[] = 
 export function MindView() {
   const activeId = useLimen((s) => s.activeSittingId);
   const sitting = useLimen((s) => s.sittings.find((x) => x.id === activeId));
-  const situation = useLimen((s) => (sitting ? s.situations.find((x) => x.id === sitting.situationId) : undefined));
+  const situation = useLimen((s) => sitting?.snapshot ?? (sitting ? s.situations.find((x) => x.id === sitting.situationId) : undefined));
   const setView = useLimen((s) => s.setView);
 
   if (!sitting || !situation) {
@@ -89,40 +92,36 @@ export function MindView() {
     );
   }
 
-  return <MindBody situation={situation} sitting={sitting} />;
+  return <MindBody key={sitting.id} situation={situation} sitting={sitting} />;
 }
 
 function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitting }) {
   const correct = useLimen((s) => s.correctReading);
+  const reviseCase = useLimen((s) => s.reviseCase);
   const answer = useLimen((s) => s.answer);
   const feedback = useLimen((s) => s.feedback);
   const keepMemory = useLimen((s) => s.keepMemory);
   const applyCheck = useLimen((s) => s.applyCheck);
+  const checkArtifact = useLimen((s) => s.checkArtifact);
   const markSeat = useLimen((s) => s.markSeat);
   const rotateRole = useLimen((s) => s.rotateRole);
-  const setGrok = useLimen((s) => s.setGrok);
   const result = sitting.result;
+  const allSittings = useLimen((s) => s.sittings);
+  const history = allSittings.filter((run) => run.situationId === situation.id);
+  const open = useLimen((s) => s.open);
+  const feedbackEvents = useLimen((s) => s.feedbackEvents);
+  const currentFeedback = effectiveFeedback(feedbackEvents).find((event) => event.caseId === situation.id);
   const [note, setNote] = useState("");
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [move, setMove] = useState<Move>("none");
-  const [pending, setPending] = useState(false);
+  const pending = false;
   const [reflectError, setReflectError] = useState("");
   const [traceOpen, setTraceOpen] = useState(false);
+  const [artifact, setArtifact] = useState("");
+  const [artifactError, setArtifactError] = useState("");
+  const [edited, setEdited] = useState({ prose: situation.prose, claim: situation.claim, objective: situation.objective, choice: situation.choice });
 
-  async function reflect() {
-    setPending(true);
-    setReflectError("");
-    try {
-      const brief = buildBrief(situation, sitting);
-      const res = await reflectFurther({ data: { brief } });
-      if (!res.ok) setReflectError(res.error);
-      else setGrok(sitting.id, res.text, res.model);
-    } catch {
-      setReflectError("The further reflection did not return.");
-    } finally {
-      setPending(false);
-    }
-  }
+  function reflect() { setReflectError(EXTERNAL_REFLECTION_DISABLED); }
 
   const noveltyLine =
     result.resembles?.caveat ??
@@ -133,15 +132,21 @@ function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitti
   return (
     <div className="mx-auto w-full max-w-3xl space-y-10">
       <header>
-        <p className="text-sm text-copper">{LEVEL_LABEL[result.level]}</p>
+        <p className="text-sm text-copper">Find what could change this decision · {LEVEL_LABEL[result.level]}</p>
         <h1 className="mt-2 font-serif text-4xl leading-tight text-fg">{situation.title}</h1>
         <p className="mt-3 text-sm text-muted">{result.attentionWhy}</p>
+        {result.retentionNote ? <p className="mt-2 text-sm text-muted">{result.retentionNote}</p> : null}
         {situation.episode === "reviewer" ? (
           <p className="mt-2 text-sm text-faint">Reviewer pilot. The packet is not the whole environment.</p>
         ) : null}
       </header>
 
-      <article className="rounded-lg bg-paper px-5 py-6 text-ink md:px-8 md:py-8">
+      <section className="rounded-lg border border-copper/40 bg-bg-raised p-5"><h2 className="font-serif text-xl">The next useful move</h2><p className="mt-2 text-fg">{result.gaps.find((gap) => gap.decisive)?.summary ?? result.gaps[0]?.summary ?? "No consequential unknown identified from this packet."}</p><p className="mt-2 text-sm text-muted">{result.actions[0]?.title ?? "Pause"}: {result.actions[0]?.why ?? "No further check suggested."}</p></section>
+
+      <details className="rounded-lg border border-line p-4"><summary className="min-h-11 cursor-pointer text-copper">Revision history · {history.length} run{history.length === 1 ? "" : "s"}</summary><ul className="mt-3 space-y-2">{history.map((run) => <li key={run.id}><button type="button" onClick={() => open(run.id)} className={`min-h-11 text-left text-sm ${run.id === sitting.id ? "text-copper" : "text-muted"}`}>{new Date(run.at).toLocaleString()} · {run.revisionReason ?? "legacy run"}{run.id === sitting.id ? " · open" : ""}</button></li>)}</ul></details>
+      <details><summary className="min-h-11 cursor-pointer text-copper">Edit this case in a new revision</summary><div className="mt-3 space-y-3">{(["prose", "claim", "objective", "choice"] as const).map((field) => <label key={field} className="block text-sm capitalize">{field}<textarea value={edited[field]} onChange={(e) => setEdited({ ...edited, [field]: e.target.value })} rows={field === "prose" ? 4 : 2} className="mt-1 w-full rounded-sm bg-bg-raised p-3 text-fg" /></label>)}<button type="button" disabled={edited.prose.trim().length < 20} onClick={() => reviseCase(edited)} className="min-h-11 rounded-sm bg-copper px-4 text-ink disabled:opacity-50">Save new revision</button></div></details>
+
+      <details><summary className="min-h-11 cursor-pointer text-copper">Read the full local reflection</summary><article className="mt-3 rounded-lg bg-paper px-5 py-6 text-ink md:px-8 md:py-8">
         {result.voice.split("\n\n").map((para) => (
           <p key={para.slice(0, 48)} className="mt-4 font-serif text-lg leading-relaxed first:mt-0">
             {para}
@@ -162,13 +167,13 @@ function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitti
         <p className="mt-6 text-sm text-ink-soft">
           This is a simulation of a witness. The trace is the thought. If the trace is wrong, the voice is wrong.
         </p>
-      </article>
+      </article></details>
 
-      {result.records ? <RecordsPanel records={result.records} /> : (
+      {result.records ? <details><summary className="min-h-11 cursor-pointer text-copper">Inspect four evidence records</summary><RecordsPanel records={result.records} /></details> : (
         <p className="text-sm text-muted">This sitting was kept before the four records existed. Open it from Sit again if you want them rebuilt.</p>
       )}
 
-      {result.hive ? (
+      <details><summary className="min-h-11 cursor-pointer text-copper">Inspect local roles and operation</summary>{result.hive ? (
         <HivePanel
           seats={result.hive}
           proposals={result.proposals ?? []}
@@ -181,26 +186,51 @@ function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitti
           onRotate={rotateRole}
         />
       ) : !sitting.grok ? (
-        <div>
-          <button
-            type="button"
-            disabled={pending}
-            onClick={() => void reflect()}
-            className="min-h-11 rounded-sm border border-line-strong px-4 text-sm text-fg disabled:opacity-60"
-          >
-            {pending ? "Reflecting inside the trace…" : "Reflect again, inside the trace"}
-          </button>
-          {reflectError ? <p className="mt-2 text-sm text-copper">{reflectError}</p> : null}
-        </div>
+        <p className="text-sm text-muted">All roles here are local procedures. External reflection is disabled until shared usage controls are available.</p>
       ) : null}
 
-      {result.router && result.jev ? <ClerkPanel router={result.router} jev={result.jev} /> : null}
+      {result.router && result.jev ? <ClerkPanel router={result.router} jev={result.jev} /> : null}</details>
 
       {result.perturbations && (situation.episode === "reviewer" || result.features.includes("sig:handoff") || result.perturbations.irrelevant.ran || result.perturbations.decisive.ran) ? (
-        <PerturbPanel perturbations={result.perturbations} onCheck={applyCheck} />
+        <PerturbPanel perturbations={result.perturbations} demo={situation.episode === "reviewer"} onCheck={applyCheck} />
       ) : null}
 
-      <section>
+      <details><summary className="min-h-11 cursor-pointer text-copper">Check a report document, if you have one</summary><section className="border-t border-line pt-6">
+        <h2 className="font-serif text-2xl text-fg">Check a report document</h2>
+        <p className="mt-2 text-sm text-muted">
+          This local shape check accepts JSON with schemaVersion “limen-report-v1” and a nonempty summary.
+          It cannot verify whether the summary is true.
+        </p>
+        <label className="mt-4 block text-sm text-muted" htmlFor="limen-report-artifact">Report JSON</label>
+        <textarea
+          id="limen-report-artifact"
+          value={artifact}
+          onChange={(event) => setArtifact(event.target.value)}
+          rows={4}
+          maxLength={4001}
+          className="mt-2 w-full rounded-sm border border-line-strong bg-bg-raised p-3 font-mono text-sm text-fg"
+          placeholder={'{"schemaVersion":"limen-report-v1","summary":"…"}'}
+        />
+        {artifactError ? <p className="mt-2 text-sm text-copper">{artifactError}</p> : null}
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              checkArtifact(artifact);
+              setArtifactError("");
+            } catch (error) {
+              setArtifactError(error instanceof Error ? error.message : "The document could not be checked.");
+            }
+          }}
+          className="mt-3 min-h-11 rounded-sm bg-bg-raised px-4 text-sm text-fg"
+        >
+          Check document shape
+        </button>
+      </section></details>
+
+      <OutcomePanel situation={situation} sitting={sitting} />
+
+      <details><summary className="min-h-11 cursor-pointer text-copper">Explore readings, other concerns, and reasoning</summary><section>
         <h2 className="font-serif text-2xl text-fg">How I am reading you</h2>
         <p className="mt-2 text-sm text-muted">These are perceptions, not facts. Correct them and I will sit again.</p>
         <ul className="mt-4 space-y-4">
@@ -282,11 +312,14 @@ function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitti
               <p className="mt-1 text-lg text-fg">{action.title}</p>
               <p className="mt-2 text-fg">{action.why}</p>
               <p className="mt-2 text-sm text-muted">{action.mismatch}</p>
-              <p className="mt-2 text-sm text-faint">Stop when: {action.stopping}</p>
+                <p className="mt-2 text-sm text-faint">Stop when: {action.stopping}</p>
+                <p className="mt-2 text-xs text-faint">Packet records: {action.supportIds?.join(", ") || "No direct source record"}. Unresolved: {action.unresolvedIds?.join(", ") || "none recorded"}.</p>
             </li>
           ))}
         </ol>
       </section>
+
+      {result.memoryCandidates?.length ? <details><summary className="min-h-11 cursor-pointer text-copper">Earlier validated lessons · check applicability</summary><ul className="mt-3 space-y-4">{result.memoryCandidates.map((candidate) => <li key={candidate.memoryId} className="border-t border-line pt-3"><p className="text-sm text-fg">{candidate.status}: {candidate.why}</p>{candidate.checklist.length ? <p className="mt-1 text-sm text-muted">Generated candidate: {candidate.checklist[0]}</p> : null}</li>)}</ul></details> : null}
 
       {result.challenges.length ? (
         <section>
@@ -332,22 +365,23 @@ function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitti
           })}
         </div>
         <p className="mt-2 text-xs text-faint">
-          Sparse tag. {result.kc.length} of 192 cells active. Novelty {result.novelty.toFixed(2)}. A familiar tag is a
+          Sparse tag. {result.kc.length} of 192 cells active. Familiarity is qualitative; this is not a calibrated probability. A familiar tag is a
           candidate, never a permission.
         </p>
       </section>
+      </details>
 
       <section className="border-t border-line pt-6">
         <h2 className="font-serif text-2xl text-fg">Was this useful?</h2>
         <p className="mt-2 text-sm text-muted">
-          Your mark changes which rules fire, which operation is preferred, and the weight of the sub-roles that spoke.
-          It does not prove the answer was true, and it does not score a branch that was not taken.
+          Your mark is tied to this revision and helps audit what was useful. Adaptive steering is off by default;
+          you can enable it on Self. A mark does not prove the answer was true or score a branch that was not taken.
         </p>
-        {sitting.feedback ? (
+        {currentFeedback?.runId === sitting.id ? (
           <p className="mt-4 text-fg">
-            Marked {sitting.feedback.verdict}
-            {sitting.feedback.move !== "none" ? `, next move: ${sitting.feedback.move}` : ""}. The tag is kept.
-            {sitting.feedback.note ? ` Note: ${sitting.feedback.note}` : ""}
+            Marked {currentFeedback.verdict}
+            {currentFeedback.move !== "none" ? `, next move: ${currentFeedback.move}` : ""}. The tag is kept.
+            {currentFeedback.note ? ` Note: ${currentFeedback.note}` : ""}
           </p>
         ) : (
           <>
@@ -443,37 +477,12 @@ function Mark({
   );
 }
 
-function buildBrief(situation: Situation, sitting: Sitting): string {
-  const r = sitting.result;
-  return [
-    `Title: ${situation.title}`,
-    `Claim: ${situation.claim || "(unstated)"}`,
-    `Objective: ${situation.objective || "(unstated)"}`,
-    `Inclined move: ${situation.choice || "(unstated)"}`,
-    `Stakes: ${situation.stakes}. Reversible: ${situation.reversible}.`,
-    `Attention: ${r.attention}. ${r.attentionWhy}`,
-    `Level: ${r.level}`,
-    `Gaps: ${r.gaps.map((g) => `${g.kind}: ${g.summary}`).join(" | ")}`,
-    `Actions: ${r.actions.map((a) => `${a.title}. ${a.why} ${a.mismatch}`).join(" | ")}`,
-    `Challenges: ${r.challenges.map((c) => c.text).join(" | ") || "none"}`,
-    `Readings: ${r.readings.map((x) => x.text).join(" | ") || "none"}`,
-    `Council: ${r.council.filter((c) => c.spoke).map((c) => `${c.agent}: ${c.text}`).join(" | ")}`,
-    `Operation: ${r.router?.op ?? "unset"}. ${r.router?.why ?? ""}`,
-    `Belief record: ${(r.records?.belief ?? []).map((item) => `${item.status}: ${item.text}`).join(" | ") || "none"}`,
-    `Self record: ${(r.records?.self ?? []).map((item) => item.text).join(" | ") || "none"}`,
-    `Already spoken: ${r.voice}`,
-    `Self-doubt already named: ${r.selfDoubt}`,
-  ]
-    .join("\n")
-    .slice(0, 5500);
-}
-
 function RecordsPanel({ records }: { records: FourRecords }) {
   return (
     <section>
       <h2 className="font-serif text-2xl text-fg">Four records</h2>
       <p className="mt-2 text-sm text-muted">
-        Observed, inferred, assumed, simulated, and unresolved stay labeled. Confirming a reading records a transition.
+        Reported, inferred, simulated, checked, and unresolved stay labeled. Confirming a reading records a transition.
         It does not erase the inference.
       </p>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -483,7 +492,7 @@ function RecordsPanel({ records }: { records: FourRecords }) {
             <p className="mt-1 text-xs text-faint">{col.hint}</p>
             <ul className="mt-3 space-y-3">
               {records[col.key].map((item) => (
-                <li key={`${item.status}-${item.text.slice(0, 48)}`}>
+                <li key={item.id}>
                   <Status item={item} />
                 </li>
               ))}
@@ -497,7 +506,7 @@ function RecordsPanel({ records }: { records: FourRecords }) {
 
 function Status({ item }: { item: EvidenceItem }) {
   const tone =
-    item.status === "observed" ? "text-moss" : item.status === "inferred" ? "text-copper" : "text-faint";
+    item.status === "reported" || item.status === "verified_check" ? "text-moss" : item.status === "inferred" ? "text-copper" : "text-faint";
   return (
     <p className="text-sm leading-relaxed text-fg">
       <span className={`mr-2 text-xs font-semibold tracking-widest uppercase ${tone}`}>{STATUS_LABEL[item.status]}</span>
@@ -670,16 +679,18 @@ function ClerkPanel({ router, jev }: { router: RouterChoice; jev: JevJudgment[] 
 
 function PerturbPanel({
   perturbations,
+  demo,
   onCheck,
 }: {
   perturbations: PerturbationView;
+  demo: boolean;
   onCheck: (check: "paraphrase" | "schema") => void;
 }) {
   return (
     <section>
       <h2 className="font-serif text-2xl text-fg">Two perturbations</h2>
       <p className="mt-2 text-sm text-muted">
-        One change should not matter. One change should. The hidden check is not in the packet until you run it.
+        One change should not matter. One change should. The reviewer example contains a simulated hidden check.
       </p>
       <div className="mt-4 space-y-4">
         <article className="border-t border-line pt-4">
@@ -701,11 +712,11 @@ function PerturbPanel({
           <p className="mt-1 text-xs text-faint">{heldLine(perturbations.decisive.ran, perturbations.decisive.held)}</p>
           <button
             type="button"
-            disabled={perturbations.decisive.ran || perturbations.decisive.note.startsWith("This case has no")}
+            disabled={!demo || perturbations.decisive.ran}
             onClick={() => onCheck("schema")}
             className="mt-3 min-h-11 rounded-sm bg-copper px-3 text-sm font-semibold text-ink disabled:opacity-50"
           >
-            {perturbations.decisive.ran ? "Check already in the record" : "Run the hidden check"}
+            {perturbations.decisive.ran ? "Simulated result revealed" : "Reveal simulated check"}
           </button>
         </article>
       </div>

@@ -1,0 +1,142 @@
+{
+  "assessed_at": "2026-09-23",
+  "commit": "c8c89f0",
+  "runtime": {
+    "node": "24.13.0",
+    "npm": "11.19.1"
+  },
+  "scope": "Assessment only. No application source changes, deployment, or paid inference.",
+  "verification": {
+    "typecheck": "pass",
+    "build": "pass in isolated copy; DATABASE_URL absent, migrations skipped",
+    "npm_test": {
+      "first_phase_pass": 187,
+      "first_phase_fail": 8,
+      "failed_file": "scripts/grok-pwa-plugin.test.mjs",
+      "second_phase": "not reached by default command"
+    },
+    "secondary_tests_run_separately": {
+      "pass": 55,
+      "fail": 0
+    },
+    "engine_tests": {
+      "included_in_npm_test": false,
+      "direct_node": "ERR_MODULE_NOT_FOUND for extensionless fly import",
+      "temporary_relative_ts_resolver": {
+        "pass": 6,
+        "fail": 0
+      }
+    },
+    "lint": {
+      "errors": 1,
+      "warnings": 1
+    },
+    "built_http": 200,
+    "browser": "Incomplete: smoke restricts paths to /workspace; CUA has no browser; agent-browser absent",
+    "screenshots": "Historical desktop and mobile screenshots inspected only",
+    "node_22": "not verified",
+    "provider": "not called"
+  },
+  "probes": {
+    "negation": [
+      {
+        "prose": "Several friends want lunch. There is no supplier incentive and no missing measurement.",
+        "attention": "stirred",
+        "features": [
+          "sig:shared-ancestor",
+          "sig:incentive",
+          "sig:unmeasured",
+          "stakes:low",
+          "rev:yes",
+          "obj:present",
+          "choice:present"
+        ],
+        "gaps": [
+          "evidence",
+          "observation",
+          "strategic"
+        ]
+      },
+      {
+        "prose": "Friends want lunch. Everything needed is established.",
+        "attention": "quiet",
+        "features": [
+          "stakes:low",
+          "rev:yes",
+          "obj:present",
+          "choice:present"
+        ],
+        "gaps": []
+      }
+    ],
+    "router_override": [
+      {
+        "opBias": {},
+        "attention": "stirred",
+        "op": "check_source",
+        "gaps": [
+          "observation"
+        ],
+        "actions": [
+          "keep-failure"
+        ]
+      },
+      {
+        "opBias": {
+          "stop": 4
+        },
+        "attention": "stirred",
+        "op": "stop",
+        "gaps": [
+          "observation"
+        ],
+        "actions": [
+          "keep-failure"
+        ]
+      }
+    ],
+    "feedback": {
+      "sittings": 1,
+      "question_answered_unknown": "convention-reverses",
+      "first_operation_bias": {
+        "check_source": 1
+      },
+      "after_revision": {
+        "feedback": null,
+        "engramCount": 1,
+        "asks": [
+          "tradeoff",
+          "delivery-committed",
+          "weight-decisive"
+        ]
+      },
+      "second_operation_bias": {
+        "check_source": 2
+      },
+      "sample_rule_after_two_marks": {
+        "fire": 1,
+        "useful": 2,
+        "noise": 0
+      },
+      "engram_count": 1
+    },
+    "duplicate_promotion": {
+      "sittings": 2,
+      "identicalProse": true,
+      "anyFeedback": false,
+      "status": "kept"
+    },
+    "multiple_roles": {
+      "input_bias": {
+        "occupy:perception:grok": 8
+      },
+      "active_grok_roles": [
+        "perception",
+        "boundary"
+      ],
+      "operation": "check_source",
+      "proof": "Separate runEngine probe; shared response display confirmed by source inspection"
+    }
+  },
+  "probe_limitations": "Synthetic in-memory cases using repository examples. Not an effectiveness benchmark or browser persistence test. A resolver hook appended .ts to extensionless relative imports for Node testing; production source was not modified."
+}

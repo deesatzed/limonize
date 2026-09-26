@@ -1,0 +1,5 @@
+
+> charter:check
+> node --import ./scripts/resolve-ts.mjs --experimental-strip-types scripts/limen-charter.mjs --check
+
+Application and documented charter agree.

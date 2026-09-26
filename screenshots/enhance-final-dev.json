@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Limen",
+      "hasCanvas": false,
+      "bodyTextLen": 861,
+      "bodyTextHash": "6c5275fe9004ddbc329bcc12acd5b21ff6b90b69fd5bc89c9402bace6dd755f1",
+      "bodyTextPrefix": "LIMEN A witness at the threshold of what it knows. Quiet I have ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/Volumes/WS4TB/jevflyme/limonize/screenshots/enhance-final-dev.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Limen",
+      "hasCanvas": false,
+      "bodyTextLen": 689,
+      "bodyTextHash": "f79922e931e19a8d37d276ad9042e7ea47f12b7941ee09db090ba28133a05dda",
+      "bodyTextPrefix": "LIMEN quiet Find what could change this decision. Describe the s",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/Volumes/WS4TB/jevflyme/limonize/screenshots/enhance-final-dev-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/Volumes/WS4TB/jevflyme/limonize/screenshots/enhance-final-dev.json"
+}

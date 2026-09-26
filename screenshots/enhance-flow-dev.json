@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "steps": [
+    "new case and result",
+    "plan saved",
+    "outcome saved",
+    "revision appended",
+    "export inspected",
+    "case deletion persisted",
+    "export reimported after deletion",
+    "corrupt storage recovery visible",
+    "lesson candidate saved",
+    "lesson promoted from distinct outcome-backed families",
+    "validated lesson reused with applicability trace"
+  ],
+  "errors": [],
+  "exportedCases": 1
+}

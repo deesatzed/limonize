@@ -1,5 +1,6 @@
 import { FEATURE_LABEL, extractFeatures, kenyon, recallFly, stripPrestige } from "./fly";
 import { enrich } from "./enrich";
+import { findAssertion } from "./interpret";
 import type {
   Ask,
   Attention,
@@ -43,7 +44,7 @@ function sig(wm: Fact[], name: string): boolean {
 }
 
 function answered(input: SitInput, id: string): boolean {
-  return input.answers[id] !== undefined;
+  return input.answers[id] === "yes" || input.answers[id] === "no";
 }
 
 const rules: Rule[] = [
@@ -80,7 +81,7 @@ const rules: Rule[] = [
       { pred: "belief-revision", a: "execution-is-not-acceptance", source: "rule" },
     ],
     because: () =>
-      "A check against the current schema failed. The success code remains observed. It does not establish a valid report.",
+      "The report-shape check failed in this case. A success code was reported; it does not establish an accepted report.",
   },
   {
     id: "gap-handoff",
@@ -538,6 +539,24 @@ const READING_COPY: Record<string, string> = {
   schema: "I am reading a failed check against the current acceptance criteria. The success code stays in the record as a success code.",
 };
 
+const READING_SOURCE: Record<string, RegExp> = {
+  "shared-ancestor": /(?:same|one|single|shared) (?:source|table|ancestor|specification)|copied (?:from|the same)|documents (?:share|copy)/i,
+  incentive: /supplier|vendor|salesperson|commission|incentive/i,
+  unmeasured: /not measured|unmeasured|missing measurement|unknown environment|not fully described/i,
+  "context-shift": /environment|operating|outdoor|real world|laboratory|transfer|different setting/i,
+  disagreement: /disagree|different convention|inconsistent|conflict/i,
+  closure: /inclined|obviously|definitely|certainly|no doubt/i,
+  pressure: /today|immediately|deadline|commit now|right away/i,
+  relevance: /lighter|lightest|cheaper|faster/i,
+  "metric-drift": /score|metric|dashboard|kpi|alert/i,
+  rare: /rare|unusual|never seen|first time|unfamiliar/i,
+  defaulted: /default|assumed value|typical value|placeholder/i,
+  units: /unit|dimension|convention|millimet|inches/i,
+  reflexive: /false alarm|prevention|changed (?:the |their )?behavior|gaming/i,
+  hedged: /i think|i feel|not sure|unsure|probably|might|perhaps/i,
+  handoff: /cannot approve|success code|tool returned|tool finished/i,
+};
+
 const ACTION_COPY: Record<string, Omit<ProposedAction, "id">> = {
   "trace-lineage": {
     title: "Trace the shared ancestor",
@@ -988,11 +1007,17 @@ export function runEngine(input: SitInput): EngineResult {
 
   const readings: Reading[] = wm
     .filter((f) => f.pred === "signal" && f.source === "signal" && READING_COPY[f.a ?? ""])
-    .map((f) => ({
-      signal: f.a ?? "",
-      text: READING_COPY[f.a ?? ""],
-      status: input.answers[f.a ?? ""] === "yes" ? "confirmed" : "open",
-    }));
+    .map((f) => {
+      const signal = f.a ?? "";
+      const pattern = READING_SOURCE[signal];
+      const hit = pattern ? findAssertion(input, pattern) : null;
+      return {
+        signal,
+        text: READING_COPY[signal],
+        status: input.answers[signal] === "yes" ? "confirmed" as const : "open" as const,
+        ...(hit ? { source: { field: hit.field, start: hit.start, end: hit.end }, certainty: hit.certainty } : {}),
+      };
+    });
 
   let actionIds = wm.filter((f) => f.pred === "action").map((f) => f.a ?? "");
   if (attention !== "quiet") actionIds = actionIds.filter((id) => id !== "stay-quiet");

@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "url": "http://127.0.0.1:8081/",
+  "results": [
+    {
+      "viewport": "desktop",
+      "ok": true,
+      "errors": [],
+      "horizontalOverflow": false,
+      "steps": [
+        "keyboard charter disclosure",
+        "pause",
+        "reload retains pause",
+        "import cannot change controls",
+        "explicit resume"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "ok": true,
+      "errors": [],
+      "horizontalOverflow": false,
+      "steps": [
+        "keyboard charter disclosure",
+        "pause",
+        "reload retains pause",
+        "import cannot change controls",
+        "explicit resume"
+      ]
+    }
+  ]
+}

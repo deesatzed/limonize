@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { construct, hasSecondCase, type Construction } from "@/lib/limen/memory";
+import { assessMemory, construct, type Construction } from "@/lib/limen/memory";
 import { useLimen } from "@/lib/limen/store";
 import type { MemoryObject } from "@/lib/limen/types";
 
@@ -13,8 +13,11 @@ const KIND: Record<MemoryObject["kind"], string> = {
 export function LedgerView() {
   const memories = useLimen((s) => s.memories);
   const sittings = useLimen((s) => s.sittings);
+  const situations = useLimen((s) => s.situations);
+  const outcomes = useLimen((s) => s.outcomeEvents);
   const retire = useLimen((s) => s.retireMemory);
   const promote = useLimen((s) => s.promoteMemory);
+  const deleteMemory = useLimen((s) => s.deleteMemory);
   const setView = useLimen((s) => s.setView);
   const [built, setBuilt] = useState<{ id: string; construction: Construction } | null>(null);
 
@@ -40,19 +43,16 @@ export function LedgerView() {
     <div className="mx-auto w-full max-w-3xl">
       <h1 className="font-serif text-4xl text-fg">Ledger</h1>
       <p className="mt-3 max-w-2xl text-muted">
-        A lesson stays a candidate until a second, separate sitting shares its pattern. Promoting it is not the same as
-        remembering an event. Generative checklists stay labeled as generated.
+        A lesson stays a candidate until two distinct, labeled families have outcome evidence supporting the chosen action. Similarity alone is not validation. Generated checklists stay labeled as generated.
       </p>
       <ul className="mt-8 space-y-8">
         {live.map((memory) => (
           <li key={memory.id} className="border-t border-line pt-5">
             <MemoryCard
               memory={memory}
-              ready={
-                memory.status === "candidate" &&
-                hasSecondCase(memory, sittings, sittings.find((s) => s.id === memory.sittingId)?.situationId)
-              }
+              readiness={assessMemory(memory, situations, sittings, outcomes)}
               onRetire={() => retire(memory.id)}
+              onDelete={() => { if (window.confirm(`Delete memory “${memory.title}” and its generated lesson?`)) deleteMemory(memory.id); }}
               onPromote={() => promote(memory.id)}
               onBuild={(mode) => setBuilt({ id: memory.id, construction: construct(memory, mode) })}
               construction={built?.id === memory.id ? built.construction : null}
@@ -78,15 +78,17 @@ export function LedgerView() {
 
 function MemoryCard({
   memory,
-  ready,
+  readiness,
   onRetire,
+  onDelete,
   onPromote,
   onBuild,
   construction,
 }: {
   memory: MemoryObject;
-  ready: boolean;
+  readiness: ReturnType<typeof assessMemory>;
   onRetire: () => void;
+  onDelete: () => void;
   onPromote: () => void;
   onBuild: (mode: "checklist" | "boundary" | "revival") => void;
   construction: Construction | null;
@@ -109,6 +111,7 @@ function MemoryCard({
       ) : null}
       <p className="mt-3 text-sm text-muted">Test: {memory.test}</p>
       <p className="mt-1 text-sm text-faint">{memory.caveat}</p>
+      <p className="mt-2 text-sm text-faint">Validation: {memory.validationStatus ?? "legacy unvalidated"}. {readiness.reason}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button type="button" onClick={() => onBuild("checklist")} className="min-h-11 rounded-sm bg-bg-raised px-3 text-sm text-fg">
           Construct a checklist
@@ -122,16 +125,17 @@ function MemoryCard({
         {memory.status === "candidate" ? (
           <button
             type="button"
-            disabled={!ready}
+            disabled={!readiness.ready}
             onClick={onPromote}
             className="min-h-11 rounded-sm bg-moss-deep px-3 text-sm text-fg disabled:opacity-50"
           >
-            {ready ? "Promote after a second case" : "Needs a second case"}
+            {readiness.ready ? "Promote with two outcomes" : "Needs independent outcome evidence"}
           </button>
         ) : null}
         <button type="button" onClick={onRetire} className="min-h-11 px-3 text-sm text-faint">
           This no longer holds
         </button>
+        <button type="button" onClick={onDelete} className="min-h-11 px-3 text-sm text-faint">Delete this memory</button>
       </div>
       {construction ? (
         <div className="mt-4 rounded-lg bg-paper px-5 py-4 text-ink">

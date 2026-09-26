@@ -1,0 +1,41 @@
+{
+  "kind": "offline scripted diagnostic; not live-model evidence",
+  "source": "/private/tmp/limen-hive-assessment-fm2llkb5",
+  "findings": {
+    "failed_critic_still_persists": {
+      "failed_loops": [
+        2
+      ],
+      "blocked": false,
+      "active_commitment": true,
+      "memory_count": 1,
+      "identity_notes": 1,
+      "same_model_accepted": true
+    },
+    "model_label_can_authorize_flip": {
+      "breakage_recorded": true,
+      "evidence_refs": [],
+      "active_position": "proceed",
+      "blocked": false
+    },
+    "reviewer_failure_after_commit": {
+      "exception_raised": true,
+      "active_commitment": true
+    },
+    "gap_claim_not_enforced": {
+      "old_identity_notes_remain": 1,
+      "commitment_consulted": false,
+      "prior_acknowledgement_accepted": true,
+      "all_review_loops_pass": true,
+      "cycle_after_restart": 1
+    },
+    "authority_flag_is_advisory": {
+      "flagged": true,
+      "included_in_next_prompt": true,
+      "grants_actual_permissions": false
+    },
+    "replay_model_alias_changes_key": {
+      "same_prompt_different_model_key": true
+    }
+  }
+}

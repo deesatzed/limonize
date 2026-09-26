@@ -20,7 +20,7 @@ export type GapKind =
   | "reflexive"
   | "competence";
 
-export type EvidenceStatus = "observed" | "inferred" | "assumed" | "simulated" | "unresolved";
+export type EvidenceStatus = "reported" | "inferred" | "assumed" | "simulated" | "unresolved" | "verified_check";
 export type FlyOp =
   | "continue"
   | "check_source"
@@ -48,8 +48,29 @@ export interface OrgProposal {
 }
 
 export interface EvidenceItem {
+  id: string;
   status: EvidenceStatus;
   text: string;
+  origin: "user" | "rule" | "demo" | "checker";
+  at: number;
+  caseId: string;
+  runId: string;
+  source?: { field: "prose" | "claim" | "objective" | "choice" | "artifact"; start: number; end: number };
+  receiptId?: string;
+}
+
+export interface CheckReceipt {
+  id: string;
+  caseId: string;
+  runId: string;
+  at: number;
+  criterion: "limen-report-v1";
+  checkerVersion: "1";
+  fingerprint: string;
+  outcome: "pass" | "fail" | "error";
+  claim: string;
+  artifact: string;
+  detail: string;
 }
 
 export interface FourRecords {
@@ -120,12 +141,16 @@ export interface Ask {
   id: string;
   text: string;
   why: string;
+  supportIds?: string[];
+  unresolvedIds?: string[];
 }
 
 export interface Reading {
   signal: string;
   text: string;
   status: "open" | "confirmed" | "dismissed";
+  source?: EvidenceItem["source"];
+  certainty?: "asserted" | "uncertain";
 }
 
 export interface CouncilNote {
@@ -141,6 +166,8 @@ export interface ProposedAction {
   why: string;
   mismatch: string;
   stopping: string;
+  supportIds?: string[];
+  unresolvedIds?: string[];
 }
 
 export interface Challenge {
@@ -157,6 +184,7 @@ export interface Resemble {
 }
 
 export interface EngineResult {
+  retentionNote?: string;
   attention: Attention;
   attentionWhy: string;
   level: ReviewLevel;
@@ -181,11 +209,13 @@ export interface EngineResult {
   hive: HiveSeat[];
   proposals: OrgProposal[];
   perturbations: PerturbationView;
+  memoryCandidates?: { memoryId: string; status: "applicable" | "unknown" | "excluded"; why: string; checklist: string[] }[];
 }
 
 export interface Situation {
   id: string;
   title: string;
+  familyId?: string;
   prose: string;
   claim: string;
   objective: string;
@@ -198,6 +228,7 @@ export interface Situation {
   episode?: "reviewer";
   revealed: string[];
   checks: string[];
+  receipts?: CheckReceipt[];
   createdAt: number;
 }
 
@@ -208,12 +239,65 @@ export interface Feedback {
   at: number;
 }
 
+export interface FeedbackEvent extends Feedback {
+  id: string;
+  runId: string;
+  caseId: string;
+  targetId: string;
+  supersedes?: string;
+}
+
+export interface RoleFeedbackEvent {
+  id: string;
+  caseId: string;
+  runId: string;
+  subRoleId: string;
+  verdict: "useful" | "noise";
+  at: number;
+  supersedes?: string;
+}
+
+export interface OutcomeEvent {
+  id: string;
+  caseId: string;
+  runId: string;
+  at: number;
+  kind: "plan" | "result" | "defer" | "trigger";
+  action?: string;
+  proposedActionId?: string;
+  memoryId?: string;
+  expectation?: string;
+  revisionCondition?: string;
+  revisitAt?: number;
+  revisitCondition?: string;
+  status?: "observed" | "reported" | "unknown" | "ongoing";
+  evidence?: string;
+  changed?: string;
+  assessment?: "supports" | "contradicts" | "unclear";
+  supersedes?: string;
+}
+
+export interface ProviderResponse {
+  id: string;
+  caseId: string;
+  runId: string;
+  roleId: RoleId;
+  requestId: string;
+  model: string;
+  text: string;
+  at: number;
+}
+
 export interface Sitting {
   id: string;
   situationId: string;
   at: number;
   result: EngineResult;
+  snapshot?: Situation;
+  parentRunId?: string;
+  revisionReason?: string;
   feedback?: Feedback;
+  responses?: ProviderResponse[];
   grok?: string;
   grokModel?: string;
 }
@@ -241,6 +325,12 @@ export interface MemoryObject {
   sittingId: string;
   at: number;
   status: "candidate" | "kept" | "retired";
+  prerequisites?: string[];
+  exclusions?: string[];
+  originFamily?: string;
+  validationCaseIds?: string[];
+  validationStatus?: "unvalidated" | "review_required" | "validated" | "counterexample";
+  counterexamples?: string[];
 }
 
 export interface Blindspot {
@@ -275,6 +365,9 @@ export interface SitInput {
   revealed?: string[];
   checks?: string[];
   episode?: "reviewer";
+  caseId?: string;
+  runId?: string;
+  receipts?: CheckReceipt[];
   selfReport?: SelfReport;
   now?: number;
   opBias?: Partial<Record<FlyOp, number>>;

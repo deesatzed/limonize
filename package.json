@@ -16,7 +16,11 @@
     "preview:stop": "node scripts/preview.mjs stop",
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test": "node --test 'scripts/**/*.test.mjs' && node --experimental-strip-types --test src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts",
+    "test": "npm run charter:check && node --test 'scripts/**/*.test.mjs' && npm run test:product",
+    "charter:write": "node --import ./scripts/resolve-ts.mjs --experimental-strip-types scripts/limen-charter.mjs",
+    "charter:check": "node --import ./scripts/resolve-ts.mjs --experimental-strip-types scripts/limen-charter.mjs --check",
+    "test:product": "node --import ./scripts/resolve-ts.mjs --experimental-strip-types --test src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts src/lib/limen/*.test.ts",
+    "eval:limen": "node --import ./scripts/resolve-ts.mjs --experimental-strip-types evaluation/limen/run.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

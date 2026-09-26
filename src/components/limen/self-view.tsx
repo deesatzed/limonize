@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { RULE_NAMES } from "@/lib/limen/engine";
 import { QUESTION_PANEL } from "@/lib/limen/questions";
 import { idleLines, useLimen } from "@/lib/limen/store";
+import { DataControls } from "./data-controls";
+import { CharterPanel } from "./charter-panel";
 
 const SIGNALS: [string, string][] = [
   ["", "No automatic link"],
@@ -24,6 +26,9 @@ export function SelfView() {
   const stats = useLimen((s) => s.ruleStats);
   const bias = useLimen((s) => s.ruleBias);
   const opBias = useLimen((s) => s.opBias);
+  const adaptiveEnabled = useLimen((s) => s.adaptiveEnabled);
+  const learningPaused = useLimen((s) => s.learningPaused);
+  const setAdaptiveEnabled = useLimen((s) => s.setAdaptiveEnabled);
   const subBias = useLimen((s) => s.subBias);
   const blindspots = useLimen((s) => s.blindspots);
   const reflexes = useLimen((s) => s.reflexes);
@@ -34,10 +39,11 @@ export function SelfView() {
   const assess = useLimen((s) => s.assessSelf);
   const release = useLimen((s) => s.release);
   const engrams = useLimen((s) => s.engrams);
+  const feedbackEvents = useLimen((s) => s.feedbackEvents);
   const activeId = useLimen((s) => s.activeSittingId);
   const lines = useMemo(
-    () => idleLines({ sittings, situations, memories, blindspots, ruleStats: stats, engrams }),
-    [sittings, situations, memories, blindspots, stats, engrams],
+    () => idleLines({ sittings, situations, memories, blindspots, ruleStats: stats, engrams, feedbackEvents }),
+    [sittings, situations, memories, blindspots, stats, engrams, feedbackEvents],
   );
   const gapKinds = useMemo(() => {
     const sitting = sittings.find((x) => x.id === activeId);
@@ -75,6 +81,9 @@ export function SelfView() {
           that they are good. {engrams.length} fly tag{engrams.length === 1 ? "" : "s"} kept.
         </p>
       </header>
+      <CharterPanel />
+      <DataControls />
+      <section className="border-t border-line pt-6"><h2 className="font-serif text-2xl">Adaptive preferences</h2><p className="mt-2 text-sm text-muted">Off by default. Marks are retained for review, but do not steer recommendations unless you enable this experiment. Local synthetic evaluation does not establish better decisions.{learningPaused ? " Learned influence is paused; resume it above to use these preferences." : ""}</p><button type="button" disabled={learningPaused} aria-pressed={adaptiveEnabled} onClick={() => setAdaptiveEnabled(!adaptiveEnabled)} className="mt-3 min-h-11 rounded-sm bg-bg-raised px-4 text-fg disabled:opacity-50">{adaptiveEnabled ? "Turn adaptive preferences off" : "Turn adaptive preferences on"}</button></section>
 
       <section>
         <h2 className="font-serif text-2xl text-fg">Rules that have fired</h2>
@@ -98,9 +107,9 @@ export function SelfView() {
       <section>
         <h2 className="font-serif text-2xl text-fg">What the marks have shifted</h2>
         <p className="mt-2 text-sm text-muted">
-          An operation weight changes the next move. An occupy weight changes which model holds a role. A configuration
-          weight is that model, in that role, using that skill. None of these is a personality, and none scores a path
-          you did not take.
+          Operation marks are advisory and do not select the next operation. When adaptive preferences are enabled,
+          applicable feedback can influence local rule and sub-role preferences. Pausing learned influence suppresses
+          those preferences. None of these scores a path you did not take.
         </p>
         <WeightList
           title="Operations"

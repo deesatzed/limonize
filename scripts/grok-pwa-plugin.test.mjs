@@ -6,9 +6,9 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import {
   appNameFromHost,
-  createHeadInjector,
+  createHeadInjector as createInjector,
   grokXCreatorHeadTags,
-  injectGrokPwaHead,
+  injectGrokPwaHead as injectHead,
   isDocumentPath,
   isInstallQuery,
   publicAppHost,
@@ -20,6 +20,15 @@ import {
 import { renderInstallPage } from "./grok-pwa-plugin.mjs";
 
 const TEMPLATE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+// Head injection reads site.json from cwd. Isolate generic platform tests from
+// this app's real branding while honoring explicit cwd fixtures below.
+const HEAD_TEST_ROOT = mkdtempSync(join(tmpdir(), "grok-head-tests-"));
+function injectGrokPwaHead(html, context = {}) {
+  return injectHead(html, { cwd: HEAD_TEST_ROOT, ...context });
+}
+function createHeadInjector(context = {}) {
+  return createInjector({ cwd: HEAD_TEST_ROOT, ...context });
+}
 
 test("injects before </head>", () => {
   const out = injectGrokPwaHead("<html><head><title>x</title></head><body></body></html>");
@@ -503,4 +512,3 @@ test("vite plugin bakes og identity as a virtual module", () => {
   assert.match(plugin, /virtual:grok-og-identity/);
   assert.match(plugin, /snapshotOgIdentity/);
 });
-
