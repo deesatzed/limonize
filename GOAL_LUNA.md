@@ -1,6 +1,6 @@
 # GOAL_LUNA — publish the foundation and build accountable autonomous commitments
 
-Created: 2026-09-26. Status: **active — L00 complete; L01 in progress**.
+Created: 2026-09-26. Status: **active — L00–L01 complete; L02 in progress**.
 
 Execution target: **LUNA**, selected by the user before starting the run. This document does not switch models. It is designed for a single agent working sequentially with small changes, fixed contracts and explicit evidence. Do not spawn other agents or change models automatically.
 

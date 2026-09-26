@@ -28,15 +28,15 @@ This is a separate completed local change following the six enhancements. Govern
 
 [A0–A11](docs/plans/2026-09-23-autonomous-development-plan.md) remain proposed implementation work. The agreed direction includes both real and simulated experience, context-sensitive automatic/advisory behavior and autonomous reversible policy development. Charter integration supplies boundaries and current controls; it does not implement the expectation/competence/commitment cycle or establish its benefit.
 
-## Luna execution goal — prepared, not started
+## Luna execution goal — active
 
 [GOAL_LUNA.md](GOAL_LUNA.md) is the user-requested execution contract for the next milestone. Follow [the runbook](docs/plans/2026-09-26-luna-execution.md) sequentially when invoked. Publication is to the goal branch; no main merge or deployment is included.
 
 | Task | Work | Status |
 |---|---|---|
 | L00 | Inventory and recovery baseline | done — manifest written from the live dirty tree |
-| L01 | Verify, commit and push existing foundation | in progress — local gates pass; branch checkpoint and publication pending |
-| L02 | Typed development contract and replay | queued |
+| L01 | Verify, commit and push existing foundation | done — P0 checkpoint SHA matches the live remote branch |
+| L02 | Typed development contract and replay | in progress |
 | L03 | Expectations and attributed resolution | queued |
 | L04 | v3 persistence, control preservation and deletion | queued |
 | L05 | Sequential worlds, separate scorer and frozen controls | queued |
