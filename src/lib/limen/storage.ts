@@ -1,5 +1,5 @@
 import type { StateStorage } from "zustand/middleware";
-import { MAX_DATA_BYTES, migrateLegacy, validateData } from "./data";
+import { MAX_DATA_BYTES, migrateLegacy, utf8ByteLength, validateData } from "./data";
 
 let issue: string | null = null;
 let recoverableRaw: string | null = null;
@@ -17,11 +17,12 @@ export const guardedStorage: StateStorage = {
     try {
       const raw = window.localStorage.getItem(name);
       if (!raw) return null;
-      if (raw.length > MAX_DATA_BYTES) throw new Error("Stored data exceeds the supported size.");
+      if (utf8ByteLength(raw) > MAX_DATA_BYTES) throw new Error("Stored data exceeds the supported size.");
       const envelope: unknown = JSON.parse(raw);
       if (!envelope || typeof envelope !== "object" || !("state" in envelope)) throw new Error("Stored data has no state.");
       const record = envelope as { state: unknown; version?: number };
-      if (record.version === 2) return JSON.stringify({ version: 2, state: validateData(record.state) });
+      if (record.version === 3) return JSON.stringify({ version: 3, state: validateData(record.state) });
+      else if (record.version === 2) return JSON.stringify({ version: 2, state: validateData(record.state) });
       else if (record.version === 0 || record.version === undefined) migrateLegacy(record.state);
       else throw new Error("Stored data has a newer, unsupported version.");
       return raw;
@@ -34,7 +35,7 @@ export const guardedStorage: StateStorage = {
   },
   setItem(name, value) {
     if (issue) return;
-    if (value.length > MAX_DATA_BYTES) { fault("Browser data exceeds the 2 MB limit."); return; }
+    if (utf8ByteLength(value) > MAX_DATA_BYTES) { fault("Browser data exceeds the 2 MB limit."); return; }
     try { window.localStorage.setItem(name, value); }
     catch (error) { fault(error instanceof Error ? error.message : "Browser storage is unavailable."); }
   },

@@ -3,8 +3,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { featurePhrases, RULE_NAMES, runEngine } from "./engine";
 import { extractFeatures } from "./fly";
 import { checkReportArtifact } from "./check";
+import { createReportExpectation, resolveReportReceipt } from "./expectations";
+import { replayDevelopment, type DevelopmentEvent, type ExpectationRecord } from "./development";
 import { currentOutcome, deriveLearning, dueFollowUps, effectiveFeedback } from "./ledger";
-import { migrateLegacy, parseImport, validateData } from "./data";
+import { migrateLegacy, migrateV2, parseImport, validateData } from "./data";
 import { guardedStorage } from "./storage";
 import { assessMemory, memoryFromResult, retrieveMemories } from "./memory";
 import type { Draft } from "./store-types";
@@ -32,6 +34,12 @@ function uid(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 }
 
+function fingerprintText(value: string): string {
+  let hash = 0x811c9dc5;
+  for (const byte of new TextEncoder().encode(value)) hash = Math.imul(hash ^ byte, 0x01000193);
+  return `fnv1a32:${(hash >>> 0).toString(16).padStart(8, "0")}`;
+}
+
 export interface LimenStore {
   view: ViewId;
   situations: Situation[];
@@ -48,11 +56,14 @@ export interface LimenStore {
   feedbackEvents: FeedbackEvent[];
   roleEvents: RoleFeedbackEvent[];
   adaptiveEnabled: boolean;
+  developmentEnabled: boolean;
+  setDevelopmentEnabled: (enabled: boolean) => void;
   learningPaused: boolean;
   setLearningPaused: (paused: boolean) => void;
   roleBias: Record<string, number>;
   setAdaptiveEnabled: (enabled: boolean) => void;
   outcomeEvents: OutcomeEvent[];
+  developmentEvents: DevelopmentEvent[];
   draft: Draft;
   setDraft: (draft: Draft) => void;
   setView: (view: ViewId) => void;
@@ -105,9 +116,11 @@ function blankData() {
     feedbackEvents: [] as FeedbackEvent[],
     roleEvents: [] as RoleFeedbackEvent[],
     adaptiveEnabled: false,
+    developmentEnabled: false,
     learningPaused: false,
     roleBias: {} as Record<string, number>,
     outcomeEvents: [] as OutcomeEvent[],
+    developmentEvents: [] as DevelopmentEvent[],
     draft: { title: "", prose: "", claim: "", objective: "", choice: "", stakes: "consequential", reversible: "partial" } as Draft,
   };
 }
@@ -187,6 +200,9 @@ export const useLimen = create<LimenStore>()(
     (set, get) => ({
       ...blankData(),
       setAdaptiveEnabled: (enabled) => set({ adaptiveEnabled: enabled }),
+      setDevelopmentEnabled: (enabled) => {
+        if (typeof enabled === "boolean") set({ developmentEnabled: enabled });
+      },
       setLearningPaused: (paused) => {
         if (typeof paused !== "boolean" || get().learningPaused === paused) return;
         set({ learningPaused: paused });
@@ -327,7 +343,34 @@ export const useLimen = create<LimenStore>()(
       checkArtifact: (artifact) => {
         const current = currentPair(get());
         if (!current) return;
-        const receipt = checkReportArtifact(artifact, current.situation.id, uid());
+        const at = Date.now();
+        const runId = uid();
+        const shouldRecordExpectation = current.situation.mode === "case" && !current.situation.episode;
+        let expectationEvents: DevelopmentEvent[] = [];
+        let expectation: ExpectationRecord | undefined;
+        if (shouldRecordExpectation) {
+          const objectiveHash = fingerprintText(current.situation.objective);
+          const sequence = replayDevelopment(get().developmentEvents).lastSequence + 1;
+          const made = createReportExpectation({
+            id: `expectation:${runId}`,
+            caseId: current.situation.id,
+            runId,
+            familyId: current.situation.familyId?.trim() || current.situation.id,
+            objectiveVersionId: `objective:${objectiveHash}`,
+            stakes: current.situation.stakes,
+            sequence,
+            at,
+          });
+          expectation = made.expectation;
+          expectationEvents = [made.event];
+        }
+        const receipt = checkReportArtifact(artifact, current.situation.id, runId, at);
+        if (expectation) {
+          const resolvedEvents = resolveReportReceipt(expectation, receipt, replayDevelopment(get().developmentEvents).lastSequence + 2);
+          const nextEvents = [...get().developmentEvents, ...expectationEvents, ...resolvedEvents];
+          replayDevelopment(nextEvents);
+          set({ developmentEvents: nextEvents });
+        }
         const situation = {
           ...current.situation,
           receipts: [...(current.situation.receipts ?? []), receipt],
@@ -425,6 +468,16 @@ export const useLimen = create<LimenStore>()(
         set({ sittings: get().sittings.map((s) => s.id === sitting.id ? { ...s, responses: [...(s.responses ?? []), response] } : s) });
       },
       deleteCase: (caseId) => {
+        const lastSequence = replayDevelopment(get().developmentEvents).lastSequence;
+        const deletionEvent: DevelopmentEvent = {
+          id: `delete-case:${caseId}:${lastSequence + 1}`,
+          sequence: lastSequence + 1,
+          at: Date.now(),
+          schemaVersion: 1,
+          kind: "dependency.deleted",
+          payload: { dependency: { kind: "case", id: caseId } },
+        };
+        const developmentEvents = replayDevelopment([...get().developmentEvents, deletionEvent]).events;
         const retained = get().sittings.filter((s) => s.situationId !== caseId);
         const situations = get().situations.filter((s) => s.id !== caseId);
         const feedbackEvents = get().feedbackEvents.filter((e) => e.caseId !== caseId);
@@ -433,7 +486,7 @@ export const useLimen = create<LimenStore>()(
         const affectedMemoryIds = new Set(get().memories.filter((m) => removedRuns.has(m.sittingId) || m.validationCaseIds?.includes(caseId)).map((m) => m.id));
         const sittings = redactLearningReferences(retained, affectedMemoryIds, true);
         const roleEvents = get().roleEvents.filter((e) => e.caseId !== caseId);
-        set({ situations, sittings, memories, feedbackEvents, roleEvents, outcomeEvents: get().outcomeEvents.filter((e) => e.caseId !== caseId), activeSittingId: removedRuns.has(get().activeSittingId ?? "") ? null : get().activeSittingId, ...deriveLearning(feedbackEvents, sittings, situations, roleEvents) });
+        set({ situations, sittings, memories, feedbackEvents, roleEvents, outcomeEvents: get().outcomeEvents.filter((e) => e.caseId !== caseId), developmentEvents, activeSittingId: removedRuns.has(get().activeSittingId ?? "") ? null : get().activeSittingId, ...deriveLearning(feedbackEvents, sittings, situations, roleEvents) });
       },
       deleteMemory: (id) => set({ memories: get().memories.filter((m) => m.id !== id), sittings: redactLearningReferences(get().sittings, new Set([id]), false) }),
       importData: (json) => {
@@ -448,11 +501,11 @@ export const useLimen = create<LimenStore>()(
     }),
     {
       name: "limen-v1",
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => guardedStorage),
       skipHydration: true,
-      migrate: (state) => {
-        const data = migrateLegacy(state);
+      migrate: (state, version) => {
+        const data = version === 2 ? migrateV2(state) : migrateLegacy(state);
         return { ...data, ...deriveLearning(data.feedbackEvents, data.sittings, data.situations) };
       },
       merge: (persisted, current) => {
@@ -476,9 +529,11 @@ export const useLimen = create<LimenStore>()(
         feedbackEvents: state.feedbackEvents,
         roleEvents: state.roleEvents,
         adaptiveEnabled: state.adaptiveEnabled,
+        developmentEnabled: state.developmentEnabled,
         learningPaused: state.learningPaused,
         roleBias: state.roleBias,
         outcomeEvents: state.outcomeEvents,
+        developmentEvents: state.developmentEvents,
         draft: state.draft,
       }),
     },

@@ -1,18 +1,25 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { useLimen } from "./store";
-import { currentOutcome, deriveLearning, dueFollowUps } from "./ledger";
+import { currentOutcome, deriveLearning, dueFollowUps, effectiveFeedback } from "./ledger";
 import { assessMemory, retrieveMemories } from "./memory";
 import { exportData, migrateLegacy, parseImport, validateData } from "./data";
 import { clearStorageIssue, guardedStorage, storageIssue } from "./storage";
 import { findAssertion } from "./interpret";
 import { runEngine } from "./engine";
+import { replayDevelopment } from "./development";
 import type { Draft, } from "./store-types";
 
 const local = new Map<string, string>();
 (globalThis as unknown as { window: unknown }).window = { localStorage: { getItem: (key: string) => local.get(key) ?? null, setItem: (key: string, val: string) => { local.set(key, val); }, removeItem: (key: string) => { local.delete(key); } }, dispatchEvent: () => true };
 const draft = (prose: string, familyId: string): Draft => ({ title: familyId, familyId, prose, claim: "", objective: "Check evidence", choice: "Wait", stakes: "consequential", reversible: "partial" });
-function reset() { useLimen.setState({ situations: [], sittings: [], activeSittingId: null, feedbackEvents: [], roleEvents: [], outcomeEvents: [], memories: [], ruleBias: {}, ruleStats: {}, opBias: {}, subBias: {}, roleBias: {}, adaptiveEnabled: false, engrams: [] }); }
+function reset() { useLimen.setState({ situations: [], sittings: [], activeSittingId: null, feedbackEvents: [], roleEvents: [], outcomeEvents: [], developmentEvents: [], memories: [], ruleBias: {}, ruleStats: {}, opBias: {}, subBias: {}, roleBias: {}, adaptiveEnabled: false, developmentEnabled: false, learningPaused: false, engrams: [] }); }
+
+test("feedback correction links win same-timestamp ordering ties", () => {
+  const prior = { id: "feedback-a", caseId: "case-a", runId: "run-a", targetId: "action-a", verdict: "useful" as const, move: "measure" as const, note: "prior", at: 10 };
+  const correction = { ...prior, id: "feedback-z", verdict: "noise" as const, note: "correction", supersedes: prior.id };
+  assert.equal(effectiveFeedback([correction, prior])[0]?.id, correction.id);
+});
 
 test("revisions are immutable and feedback correction is effective once per case", () => {
   reset();
@@ -73,7 +80,28 @@ test("document receipts survive revision export and forged check labels are reje
   assert.equal(exported.data.sittings[0].snapshot.receipts[0].outcome, "pass");
   assert.equal(parseImport(JSON.stringify(exported), useLimen.getState()).preview.runs, 2);
   exported.data.sittings[0].snapshot.receipts[0].outcome = "fail";
-  assert.throws(() => parseImport(JSON.stringify(exported), useLimen.getState()), /does not match its artifact/);
+  assert.throws(() => parseImport(JSON.stringify(exported), useLimen.getState()), /does not match a fresh local check/);
+});
+
+test("an artifact check records its expectation before the linked receipt resolution", () => {
+  reset();
+  useLimen.getState().sit(draft("A report was produced but its required shape is not yet checked. Preserve the actual artifact.", "report"));
+  useLimen.getState().checkArtifact('{"schemaVersion":"limen-report-v1","summary":"Ready"}');
+  const state = useLimen.getState();
+  const replay = replayDevelopment(state.developmentEvents);
+  assert.deepEqual(replay.events.map((event) => event.kind), ["expectation.recorded", "observation.released", "expectation.resolved"]);
+  assert.equal(replay.expectations[0]?.runId, state.sittings[0]?.id);
+  assert.equal(replay.observations[0]?.source.kind, "check_receipt");
+  assert.equal(replay.observations[0]?.source.sourceId, state.sittings[0]?.snapshot?.receipts?.[0]?.id);
+  assert.equal(replay.resolutions[0]?.status, "supported");
+
+  const caseId = state.situations[0]!.id;
+  useLimen.getState().deleteCase(caseId);
+  const afterDelete = replayDevelopment(useLimen.getState().developmentEvents);
+  assert.equal(afterDelete.expectations.length, 0);
+  assert.equal(afterDelete.observations.length, 0);
+  assert.equal(afterDelete.resolutions.length, 0);
+  assert.deepEqual(afterDelete.deletedDependencies, [{ kind: "case", id: caseId }]);
 });
 
 test("deletion removes outcomes and stale provider responses cannot recreate a case", () => {

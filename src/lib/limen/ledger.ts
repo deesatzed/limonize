@@ -2,7 +2,12 @@ import type { FeedbackEvent, FlyEngram, FlyOp, OutcomeEvent, RoleFeedbackEvent, 
 
 export function effectiveFeedback(events: FeedbackEvent[]): FeedbackEvent[] {
   const byCase = new Map<string, FeedbackEvent>();
-  for (const event of [...events].sort((a, b) => a.at - b.at || a.id.localeCompare(b.id))) {
+  for (const event of [...events].sort((a, b) => {
+    if (a.at !== b.at) return a.at - b.at;
+    if (a.supersedes === b.id) return 1;
+    if (b.supersedes === a.id) return -1;
+    return a.id.localeCompare(b.id);
+  })) {
     byCase.set(event.caseId, event);
   }
   return [...byCase.values()];
