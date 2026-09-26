@@ -40,8 +40,8 @@ This is a separate completed local change following the six enhancements. Govern
 | L03 | Expectations and attributed resolution | done — actual report checks link to prior expectation and recomputed receipt resolution |
 | L04 | v3 persistence, control preservation and deletion | done — v0/v2 migration, v3 ledger, import safeguards, partial export and UTF-8 limits verified |
 | L05 | Sequential worlds, separate scorer and frozen controls | done — bounded simulated worlds, separate evaluator/scorer, 16 fixed variants, seven arms and hash-checked preflight |
-| L06 | Evidence-derived competence and candidate commitments | in progress |
-| L07 | Reviewed admission and coherent selection | queued |
+| L06 | Evidence-derived competence and candidate commitments | done — event-derived profiles, independent family support, inert candidates and reconsideration conditions pass |
+| L07 | Reviewed admission and coherent selection | in progress |
 | L08 | Bounded autonomous queue and recovery | queued |
 | L09 | Integrated product and rehearsal flow | queued |
 | L10 | Comparative evaluation and scope disposition | queued |
