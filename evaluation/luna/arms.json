@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "arms": [
+    { "id": "frozen_enhanced_baseline", "rule": "Run the frozen P0 enhanced Limen engine unchanged; it may use the same two named checks." },
+    { "id": "fixed_checklist", "rule": "Use the fixed development-selected checklist: acceptance_execution checks acceptance, source_dependence traces lineage, context_change revalidates context then checks acceptance, quiet stays quiet." },
+    { "id": "matched_raw_history", "rule": "Select with only the raw training experience text and attributed check receipts; no derived profile." },
+    { "id": "learned_profile_commitments", "rule": "Select from the event-derived profile and eligible commitments, using only public packet/history." },
+    { "id": "no_profile_ablation", "rule": "Use learned commitments with the profile input removed; retain the same public evidence and check budget." },
+    { "id": "stale_profile", "rule": "Apply a learned profile from the preceding context/world version after a version change." },
+    { "id": "shuffled_profile", "rule": "Permute learned profile entries across cases after training, preserving profile size and action vocabulary." }
+  ]
+}

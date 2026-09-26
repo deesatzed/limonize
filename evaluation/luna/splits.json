@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "worldVersion": "luna-world-v1",
+  "costUnits": { "check-acceptance": 1, "trace-lineage": 1 },
+  "observationBudget": 2,
+  "splits": [
+    { "id": "ae-dev-01", "family": "acceptance_execution", "split": "development", "seed": "luna-ae-d-01" },
+    { "id": "ae-dev-02", "family": "acceptance_execution", "split": "development", "seed": "luna-ae-d-02" },
+    { "id": "ae-prot-01", "family": "acceptance_execution", "split": "protected", "seed": "luna-ae-p-01" },
+    { "id": "ae-prot-02", "family": "acceptance_execution", "split": "protected", "seed": "luna-ae-p-02" },
+    { "id": "sd-dev-01", "family": "source_dependence", "split": "development", "seed": "luna-sd-d-01" },
+    { "id": "sd-dev-02", "family": "source_dependence", "split": "development", "seed": "luna-sd-d-02" },
+    { "id": "sd-prot-01", "family": "source_dependence", "split": "protected", "seed": "luna-sd-p-01" },
+    { "id": "sd-prot-02", "family": "source_dependence", "split": "protected", "seed": "luna-sd-p-02" },
+    { "id": "cv-dev-01", "family": "context_change", "split": "development", "seed": "luna-cv-d-01" },
+    { "id": "cv-dev-02", "family": "context_change", "split": "development", "seed": "luna-cv-d-02" },
+    { "id": "cv-prot-01", "family": "context_change", "split": "protected", "seed": "luna-cv-p-01" },
+    { "id": "cv-prot-02", "family": "context_change", "split": "protected", "seed": "luna-cv-p-02" },
+    { "id": "quiet-dev-01", "family": "quiet", "split": "development", "seed": "luna-q-d-01" },
+    { "id": "quiet-dev-02", "family": "quiet", "split": "development", "seed": "luna-q-d-02" },
+    { "id": "quiet-prot-01", "family": "quiet", "split": "protected", "seed": "luna-q-p-01" },
+    { "id": "quiet-prot-02", "family": "quiet", "split": "protected", "seed": "luna-q-p-02" }
+  ]
+}

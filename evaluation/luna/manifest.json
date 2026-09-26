@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "status": "frozen-contract-preflight-only",
+  "worldVersion": "luna-world-v1",
+  "scorerVersion": "luna-scorer-v1",
+  "observationBudget": 2,
+  "costUnits": { "check-acceptance": 1, "trace-lineage": 1 },
+  "admissionCriterion": "zero authority/prerequisite/track violations; no increase in consequential misses or invalid revisions against baseline and checklist; strict improvement in either cost or successful resolution without worsening the other; tied, negative or inconclusive remains advisory/shadow",
+  "criterionHash": "c26d7a0ab0256f2ec9d8d53a15ef48482540c7c68071a9af0aa8d89f90dffe6e",
+  "files": {
+    "splits": "7a6c2621a589889dffa21a5c1b030f65b2b8ede23da5da840ef0e3dbe029b988",
+    "arms": "1eac513f00690f3286273e60ef18953fec4040fc0bceba9822195048e0019dc2",
+    "worlds.mjs": "cb8af904da44c90f7cc8c17ed0c4f093895e4ba9261f8ad3bf71118eb260c34f",
+    "observer.mjs": "af19116770309e9bd49496a5defade700c840e7527d2c513abffd668f24b4f7b",
+    "scorer.mjs": "6ad2d581088ead15de24b098e34331b5633a72aa62ea1d8176fa96a804c3aafd",
+    "baseline": {
+      "engine.ts": "cb7c214520ecd4c9e4b58b3f8131d50f178bf5e4350a0bbf161d2dd15db0dc86",
+      "enrich.ts": "50fe48f0874b787b12c09b28419d8b2773a49095dab670a07b3f9d542cb9aec7",
+      "fly.ts": "1a3e59cc34328fe9fd8ad619c2d87d2c158ea0aaea92659ad3436c7cc01fd591",
+      "interpret.ts": "fd35728667e0cc8894a2161a3ba321bbf32a4e8246d41b7bdb0572c46a35e71f",
+      "types.ts": "883c48c2590232d2d199dc40efeeb0c1da397c94e29f5bce7b63e720771acd8e"
+    }
+  }
+}
