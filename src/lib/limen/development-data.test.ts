@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { useLimen } from "./store";
-import { DATA_VERSION, MAX_DATA_BYTES, exportData, migrateLegacy, parseImport, utf8ByteLength, validateData } from "./data";
+import { DATA_VERSION, MAX_DATA_BYTES, exportData, migrateLegacy, migrateV3, parseImport, utf8ByteLength, validateData } from "./data";
 import { clearStorageIssue } from "./storage";
 import { replayDevelopment, type DevelopmentEvent } from "./development";
 import type { Draft } from "./store-types";
@@ -11,7 +11,7 @@ const local = new Map<string, string>();
 const draft: Draft = { title: "Report", familyId: "report-family", prose: "The submitted report requires a local shape check before it is used.", claim: "The shape is acceptable.", objective: "Check the report shape", choice: "Inspect", stakes: "consequential", reversible: "yes" };
 
 function reset() {
-  useLimen.setState({ situations: [], sittings: [], activeSittingId: null, feedbackEvents: [], roleEvents: [], outcomeEvents: [], developmentEvents: [], developmentEnabled: false, learningPaused: false, adaptiveEnabled: false, memories: [], ruleBias: {}, ruleStats: {}, opBias: {}, subBias: {}, roleBias: {}, engrams: [] });
+  useLimen.setState({ situations: [], sittings: [], activeSittingId: null, feedbackEvents: [], roleEvents: [], outcomeEvents: [], developmentEvents: [], developmentJobs: [], developmentDeferredSourceEventIds: [], developmentProcessing: false, developmentEnabled: false, learningPaused: false, adaptiveEnabled: false, memories: [], ruleBias: {}, ruleStats: {}, opBias: {}, subBias: {}, roleBias: {}, engrams: [] });
 }
 
 function checkedState() {
@@ -28,11 +28,11 @@ function emptyImportTarget(source: ReturnType<typeof checkedState>) {
   };
 }
 
-test("v3 export carries attributed development events and v2 imports migrate with an empty ledger", () => {
+test("v4 export carries attributed development events and v2 imports migrate with an empty ledger", () => {
   const source = checkedState();
-  assert.equal(DATA_VERSION, 3);
+  assert.equal(DATA_VERSION, 4);
   const exported = JSON.parse(exportData(source));
-  assert.equal(exported.version, 3);
+  assert.equal(exported.version, 4);
   assert.equal(exported.data.developmentEvents.length, 3);
   const v2 = structuredClone(exported);
   v2.version = 2;
@@ -62,7 +62,7 @@ test("old persisted state migrates without turning development on or unpausing l
   assert.equal(migrated.outcomeEvents.length, source.outcomeEvents.length);
 });
 
-test("the persisted v0 and v2 envelopes both hydrate as v3 with learning disabled by default", async () => {
+test("the persisted v0 and v2 envelopes both hydrate as v4 with learning disabled by default", async () => {
   for (const version of [0, 2]) {
     checkedState();
     useLimen.getState().setAdaptiveEnabled(true);
@@ -79,7 +79,7 @@ test("the persisted v0 and v2 envelopes both hydrate as v3 with learning disable
     clearStorageIssue();
     await useLimen.persist.rehydrate();
     const saved = JSON.parse(local.get("limen-v1")!);
-    assert.equal(saved.version, 3);
+    assert.equal(saved.version, 4);
     assert.equal(useLimen.getState().developmentEnabled, false);
     assert.deepEqual(useLimen.getState().developmentEvents, []);
     assert.equal(useLimen.getState().learningPaused, version === 2);
@@ -87,6 +87,58 @@ test("the persisted v0 and v2 envelopes both hydrate as v3 with learning disable
     assert.equal(useLimen.getState().feedbackEvents.length, 1);
     assert.equal(useLimen.getState().outcomeEvents.length, 1);
   }
+});
+
+test("v3 queue migration reconstructs only retained current-version source jobs; v4 reload preserves pending work", async () => {
+  const source = checkedState();
+  source.setDevelopmentEnabled(true);
+  source.queueDevelopmentWork();
+  const queued = useLimen.getState();
+  assert.equal(queued.developmentJobs.length, 2);
+  assert.equal(queued.developmentJobs.every((job) => job.status === "queued"), true);
+  const v4 = validateData(queued);
+  assert.equal(v4.developmentJobs.length, 2);
+
+  const oldV3 = { ...queued } as Record<string, unknown>;
+  delete oldV3.developmentJobs;
+  delete oldV3.developmentDeferredSourceEventIds;
+  const migrated = migrateV3(oldV3);
+  assert.equal(migrated.developmentJobs.length, 2);
+  assert.equal(migrated.developmentJobs.every((job) => job.status === "queued"), true);
+
+  useLimen.setState({ developmentJobs: queued.developmentJobs, developmentDeferredSourceEventIds: queued.developmentDeferredSourceEventIds });
+  const exported = JSON.parse(exportData(useLimen.getState()));
+  const target = emptyImportTarget(useLimen.getState());
+  const imported = parseImport(JSON.stringify(exported), target);
+  assert.equal("developmentJobs" in imported.merged, false);
+});
+
+test("enabled app-open processing derives attributed summaries and commits job completion", async () => {
+  checkedState();
+  useLimen.setState({ developmentEnabled: true });
+  useLimen.getState().queueDevelopmentWork();
+  await useLimen.getState().runDevelopmentWork();
+  const result = useLimen.getState();
+  assert.ok(result.developmentEvents.some((event) => event.kind === "competence.derived"));
+  assert.ok(result.developmentJobs.length > 0);
+  assert.ok(result.developmentJobs.every((job) => job.status === "completed"));
+});
+
+test("the user-facing rehearsal autonomously records evidence and trials while the comparative gate keeps steering shadowed", async () => {
+  reset();
+  useLimen.setState({ developmentEnabled: true });
+  await useLimen.getState().runLocalRehearsal();
+  const processed = replayDevelopment(useLimen.getState().developmentEvents);
+  assert.ok(processed.policies.some((policy) => policy.lifecycle === "testing"));
+  assert.ok(processed.trials.length > 0);
+  assert.ok(processed.trials.some((trial) => trial.outcome === "quiet_control"));
+  assert.ok(useLimen.getState().developmentJobs.every((job) => job.status !== "queued"));
+
+  assert.equal(processed.applications.length, 0);
+  const exported = JSON.parse(exportData(useLimen.getState()));
+  const reloaded = validateData(exported.data);
+  assert.equal(replayDevelopment(reloaded.developmentEvents).policies.length, processed.policies.length);
+  assert.ok(reloaded.developmentEvents.some((event) => event.kind === "observation.released" && event.payload.observation.track === "simulated"));
 });
 
 test("imports preserve current development and pause controls while merging valid history", () => {

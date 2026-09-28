@@ -138,11 +138,15 @@ export function prepareReconsideration(events: readonly DevelopmentEvent[], poli
   const replay = replayDevelopment(events);
   const policy = replay.policies.find((row) => row.id === policyVersionId);
   if (!policy || policy.supersededByVersionId || !["testing", "active"].includes(policy.lifecycle)) return null;
+  const policyEvent = replay.events.find((event) => event.kind === "policy.version_recorded" && event.payload.policyVersion.id === policy.id);
+  if (!policyEvent) return null;
   let reasonCode: "contradiction" | "context_changed" | "objective_changed" | "method_changed" | undefined;
   if (policy.context.objectiveVersionId !== currentContext.objectiveVersionId) reasonCode = "objective_changed";
   else if (policy.context.methodVersion !== currentContext.methodVersion) reasonCode = "method_changed";
   else if (policy.context.contextVersionId !== currentContext.contextVersionId || policy.context.worldVersion !== currentContext.worldVersion) reasonCode = "context_changed";
   else if (replay.resolutions.some((resolution) => {
+    const resolutionEvent = replay.events.find((event) => event.kind === "expectation.resolved" && event.payload.resolution.id === resolution.id);
+    if (!resolutionEvent || resolutionEvent.sequence <= policyEvent.sequence) return false;
     if (resolution.status !== "contradicted" || resolution.track !== policy.track) return false;
     const expectation = replay.expectations.find((row) => row.id === resolution.expectationId);
     return expectation?.actionId === (policy.action.kind === "prefer_check" ? policy.action.actionId : "check-acceptance")

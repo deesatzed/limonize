@@ -13,7 +13,7 @@ import type { Draft, } from "./store-types";
 const local = new Map<string, string>();
 (globalThis as unknown as { window: unknown }).window = { localStorage: { getItem: (key: string) => local.get(key) ?? null, setItem: (key: string, val: string) => { local.set(key, val); }, removeItem: (key: string) => { local.delete(key); } }, dispatchEvent: () => true };
 const draft = (prose: string, familyId: string): Draft => ({ title: familyId, familyId, prose, claim: "", objective: "Check evidence", choice: "Wait", stakes: "consequential", reversible: "partial" });
-function reset() { useLimen.setState({ situations: [], sittings: [], activeSittingId: null, feedbackEvents: [], roleEvents: [], outcomeEvents: [], developmentEvents: [], memories: [], ruleBias: {}, ruleStats: {}, opBias: {}, subBias: {}, roleBias: {}, adaptiveEnabled: false, developmentEnabled: false, learningPaused: false, engrams: [] }); }
+function reset() { useLimen.setState({ situations: [], sittings: [], activeSittingId: null, feedbackEvents: [], roleEvents: [], outcomeEvents: [], developmentEvents: [], developmentJobs: [], developmentDeferredSourceEventIds: [], developmentProcessing: false, memories: [], ruleBias: {}, ruleStats: {}, opBias: {}, subBias: {}, roleBias: {}, adaptiveEnabled: false, developmentEnabled: false, learningPaused: false, engrams: [] }); }
 
 test("feedback correction links win same-timestamp ordering ties", () => {
   const prior = { id: "feedback-a", caseId: "case-a", runId: "run-a", targetId: "action-a", verdict: "useful" as const, move: "measure" as const, note: "prior", at: 10 };

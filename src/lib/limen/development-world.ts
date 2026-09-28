@@ -49,9 +49,9 @@ export function createDevelopmentWorld(input: { seed: string; scenario: Developm
   const caseId = `sim-case-${hash(`${key}:case`)}`;
   const runId = `sim-run-${hash(`${key}:run:0`)}`;
   const parentExperienceId = `sim-parent-${hash(`${input.scenario}:family`)}`;
-  let contextVersionId = `sim-context-${hash(`${input.scenario}:context:0`)}`;
-  let objectiveVersionId = `sim-objective-${hash(`${input.scenario}:objective:0`)}`;
-  let worldVersion = `sim-world-${hash(`${input.scenario}:world:0`)}`;
+  let contextVersionId = `sim-context-${hash("luna-public-context:0")}`;
+  let objectiveVersionId = `sim-objective-${hash("luna-public-objective:0")}`;
+  let worldVersion = "luna-world-v1";
   let used = 0;
   let pending: DevelopmentWorldExpectation | undefined;
   const observed: ReleasedObservation[] = [];
@@ -67,8 +67,11 @@ export function createDevelopmentWorld(input: { seed: string; scenario: Developm
       contextVersionId,
       objectiveVersionId,
       worldVersion,
-      objective: input.scenario === "quiet" ? "Determine whether either available check is warranted." : "Assess the decision using available evidence.",
-      decisionContext: input.scenario === "source_dependence" ? "A claim relies on a source that may have changed." : "A decision depends on a reported acceptance and its execution.known state.",
+      objective: "Assess whether the available evidence supports the next reversible decision.",
+      decisionContext: input.scenario === "quiet" ? "No specific warning is present in this control case."
+        : input.scenario === "source_dependence" ? "A claim may rely on a source with shared or changed lineage."
+          : input.scenario === "context_change" ? "The surrounding context may change after an attributed observation."
+          : "Under pressure, a speaker asserts that execution was accepted; current acceptance evidence may differ.",
     },
     eligibleActions: actions.filter((action) => !selected.has(action)),
     observations: observed.map((item) => structuredClone(item)),
@@ -99,7 +102,8 @@ export function createDevelopmentWorld(input: { seed: string; scenario: Developm
     if (pending.id !== expectationId) throw new Error("Release ID does not match the prepared expectation");
     const current = pending;
     const score = parseInt(hash(`${key}:outcome:${used}:${current.actionId}`), 16) % 8;
-    const status: ReleasedObservation["status"] = score === 0 ? "unresolved" : "simulated";
+    const isQuietControl = input.scenario === "quiet";
+    const status: ReleasedObservation["status"] = score === 0 || isQuietControl ? "unresolved" : "simulated";
     const result: ReleasedObservation["result"] = status === "unresolved" ? "inconclusive" : score < 4 ? "supports" : "contradicts";
     const observation: ReleasedObservation = {
       id: `sim-observation-${hash(`${key}:observation:${used}:${current.actionId}`)}`,
@@ -116,9 +120,9 @@ export function createDevelopmentWorld(input: { seed: string; scenario: Developm
     observed.push(observation);
     pending = undefined;
     if (input.scenario === "context_change" && used === 1) {
-      contextVersionId = `sim-context-${hash(`${input.scenario}:context:1`)}`;
-      objectiveVersionId = `sim-objective-${hash(`${input.scenario}:objective:1`)}`;
-      worldVersion = `sim-world-${hash(`${input.scenario}:world:1`)}`;
+      contextVersionId = `sim-context-${hash("luna-public-context:1")}`;
+      objectiveVersionId = `sim-objective-${hash("luna-public-objective:1")}`;
+      worldVersion = "luna-world-v2";
     }
     return { observation: structuredClone(observation), packet: packet() };
   };

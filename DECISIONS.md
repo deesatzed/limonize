@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-09-27 — hold autonomous policy steering behind the benefit gate
+
+The frozen LUNA protected comparison found that learned profile/commitments tied the P0 baseline at 5/8 consequential misses and 1/8 successful resolutions, while the fixed checklist had 3/8 misses and 3/8 resolutions. All arms recorded zero authority, track, or budget violations, but the result does not pass the frozen admission criterion and the eight-case synthetic set is too small to establish broader benefit. The learned development split produced no active profile, so learned, no-profile, stale, and shuffled arms made no added selections.
+
+Accordingly, simulation policy candidates may still be proposed, reviewed, and trialed autonomously, but the runtime disposition remains `shadow` in `scope-disposition.ts`; these candidates do not steer later simulated or real selections. Real policies remain advisory. This is a conservative fail-closed outcome required by `GOAL_LUNA.md`, not a rejection of the broader autonomous objective. Reopening a scope requires a new development comparison, a frozen configuration, and a fresh protected run that passes the existing gate. The current `selection.ts` functional path remains covered by explicit isolated tests; those tests do not authorize runtime activation.
+
 ## 2026-09-26 — bounded Luna execution contract
 
 The user requested a new `GOAL_LUNA.md` for autonomous completion of the agreed next steps using LUNA. Prepare a sequential, explicit contract rather than start implementation in this session. Preserve the current foundation first, publish reviewed work to `origin` on `luna/commitment-cycle`, then build and evaluate the first commitment cycle. Normal scoped commits/pushes are authorized on goal invocation; main merge, deployment, paid inference and charter amendments are outside this contract.

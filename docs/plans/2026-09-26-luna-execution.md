@@ -8,7 +8,7 @@
 
 **Tech stack:** Existing TypeScript, React, Zustand, Node test runner, local deterministic checks and offline JS evaluation. No added model, database or provider.
 
-Status: ready; all L-tasks initially queued. Do not create a worktree from the old HEAD before preserving the uncommitted foundation.
+Status: L00–L11 complete; L12 final publication in progress. Do not create a worktree from the old HEAD before preserving the uncommitted foundation.
 
 ## How to use each task
 
@@ -164,6 +164,8 @@ Admission here uses the frozen rules on released prospective trial outcomes in a
 5. Test a full automatically triggered candidate→trial→scoped activation→application→contradiction sequence. Only the initial development-mode enablement may require a user toggle; no per-policy acceptance step.
 6. Run cycle/data/selection/charter/workflow suites and typecheck.
 
+**Implementation note:** `runDevelopmentWork()` is called after hydration, on enable/resume, and after a local receipt. The pure worker is intentionally deterministic: real-track candidates remain advisory; simulated candidates receive three reviews, a testing transition, and at most two released episodes. Current `scope-disposition.ts` keeps their lifecycle in testing/shadow after the L10 benefit gate failed. A world/context mismatch or no-progress preparation stays pending and is retried only when the app opens or the user resumes. Isolated functional tests use an explicit active-scope fixture to verify the selector/admission mechanism; this does not override runtime disposition.
+
 **Gates P3/P5/P6:** automatic bounded progress, honest pending states, effective cancellation and recoverable persistence.
 
 ## L09 — integrate a compact, usable product journey
@@ -177,20 +179,20 @@ Admission here uses the frozen rules on released prospective trial outcomes in a
 4. Add a clearly labeled local rehearsal using the simulation world module, isolated from real family support. Let users see the pressure/assertion/check/reconsideration sequence without editing storage through developer tools.
 5. Test keyboard/touch controls and explanatory states through component/store integration; run product tests and typecheck. Preserve mobile layout and progressive disclosure.
 
-**Gate P7 preparation:** a normal user can observe the lifecycle and its limits. Commit the L08–L09 slice.
+**Gate P7 preparation:** a normal user can observe the lifecycle and its limits. The current LUNA comparative disposition keeps policies in testing/shadow, so the UI explains that trial evidence does not steer a later check. The L08–L09 implementation and L10 disposition are verified together in the current checkpoint.
 
 ## L10 — run comparisons and apply the honest disposition
 
 **Files:** `evaluation/luna/`, run-specific results; `docs/evidence/luna/`; draft `LUNA_REPORT.md`.
 
-1. Verify source and frozen evaluation manifests. Run development comparisons first, diagnose defects there, and freeze the final configuration before the protected run.
+1. Verify source and frozen evaluation manifests. Run `npm run eval:luna -- --preflight`, then `npm run eval:luna` for development-only comparisons. Inspect defects and all per-case outputs there. Once code and configuration are frozen, run the protected split exactly once with `npm run eval:luna -- --protected --development-run=evaluation/luna/results/<development-run-id>.json`; the runner rejects a development artifact with a different manifest hash.
 2. Run all seven arms on matched histories, budgets and released information. Record every step, cost, failed check, baseline/selected action, scope and policy contribution. Store immutable run IDs; `latest` may only be an index.
 3. Check distinct arms actually exercise their intended path. If learned and baseline outputs are identical, report no behavioral contribution there. If no-history/shuffled controls behave identically everywhere, investigate whether the profile is decorative; P4 is not satisfied by relabeling it.
 4. Apply the frozen gate by family/track. Report raw counts and per-case data as well as aggregates; retain adverse cases. Differentiate functional success from advantage over the strongest simple control.
 5. If benefit is negative/inconclusive, keep unsupported policies shadow/advisory and finish. Do not change protected scores/thresholds to obtain a pass. After evaluation-driven changes, a fresh protected set is required for a new benefit claim; preserve the earlier result.
 6. Add a regression for any actual correctness defect fixed, rerun affected suites, and document any admission-state change in UI/data.
 
-**Gate P8:** complete reproducible comparisons and honest scope disposition. No mandate to claim a positive result. Real-scope active learned steering remains deferred under this goal regardless of simulation results.
+**Gate P8:** complete reproducible comparisons and honest scope disposition. No mandate to claim a positive result. Real-scope active learned steering remains deferred under this goal regardless of simulation results. The first protected comparison did not pass; simulation policy steering is therefore held in testing/shadow until a fresh protected evaluation passes.
 
 ## L11 — final verification on the exact source
 

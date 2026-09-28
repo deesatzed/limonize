@@ -6,8 +6,12 @@ import { checkReportArtifact } from "./check";
 import { createReportExpectation, resolveReportReceipt } from "./expectations";
 import { activePolicyVersions, replayDevelopment, type DevelopmentEvent, type ExpectationRecord } from "./development";
 import { selectNextCheck } from "./selection";
+import { DEVELOPMENT_JOB_INPUT_VERSION, enqueueForDevelopmentEvents, createDevelopmentCycleState, mergeDevelopmentJobs, recoverDevelopmentQueue, runDevelopmentCycle, type DevelopmentJobState } from "./development-cycle";
+import { prepareDevelopmentJob } from "./development-worker";
+import { createLocalRehearsalApplication, createLocalRehearsalEvents } from "./development-rehearsal";
+import { prepareRetirement } from "./policy-review";
 import { currentOutcome, deriveLearning, dueFollowUps, effectiveFeedback } from "./ledger";
-import { migrateLegacy, migrateV2, parseImport, validateData } from "./data";
+import { migrateLegacy, migrateV2, migrateV3, parseImport, validateData } from "./data";
 import { guardedStorage } from "./storage";
 import { assessMemory, memoryFromResult, retrieveMemories } from "./memory";
 import type { Draft } from "./store-types";
@@ -35,10 +39,35 @@ function uid(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 }
 
+let developmentCycleEpoch = 0;
+let developmentCycleRunning = false;
+let developmentCycleRerunRequested = false;
+
 function fingerprintText(value: string): string {
   let hash = 0x811c9dc5;
   for (const byte of new TextEncoder().encode(value)) hash = Math.imul(hash ^ byte, 0x01000193);
   return `fnv1a32:${(hash >>> 0).toString(16).padStart(8, "0")}`;
+}
+
+function queueEligibleDevelopmentWork(state: LimenStore, sourceEvents = state.developmentEvents): Pick<LimenStore, "developmentEvents" | "developmentJobs" | "developmentDeferredSourceEventIds"> {
+  if (!state.developmentEnabled || state.learningPaused) return {
+    developmentEvents: state.developmentEvents,
+    developmentJobs: state.developmentJobs,
+    developmentDeferredSourceEventIds: state.developmentDeferredSourceEventIds,
+  };
+  const replay = replayDevelopment(state.developmentEvents);
+  const cycle = {
+    ...createDevelopmentCycleState(),
+    jobs: state.developmentJobs,
+    deferredSourceEventIds: state.developmentDeferredSourceEventIds,
+  };
+  const queued = enqueueForDevelopmentEvents(cycle, sourceEvents, Date.now(), replay.lastSequence + 1);
+  const developmentEvents = queued.events.length ? replayDevelopment([...state.developmentEvents, ...queued.events]).events : state.developmentEvents;
+  return {
+    developmentEvents,
+    developmentJobs: queued.state.jobs,
+    developmentDeferredSourceEventIds: queued.state.deferredSourceEventIds,
+  };
 }
 
 function applicationForSelection(
@@ -103,6 +132,14 @@ export interface LimenStore {
   setAdaptiveEnabled: (enabled: boolean) => void;
   outcomeEvents: OutcomeEvent[];
   developmentEvents: DevelopmentEvent[];
+  developmentJobs: DevelopmentJobState[];
+  developmentDeferredSourceEventIds: string[];
+  developmentProcessing: boolean;
+  queueDevelopmentWork: () => void;
+  runDevelopmentWork: () => Promise<void>;
+  runLocalRehearsal: () => Promise<void>;
+  retireDevelopmentPolicy: (policyVersionId: string) => void;
+  deleteDevelopmentPolicy: (policyVersionId: string) => void;
   draft: Draft;
   setDraft: (draft: Draft) => void;
   setView: (view: ViewId) => void;
@@ -160,6 +197,9 @@ function blankData() {
     roleBias: {} as Record<string, number>,
     outcomeEvents: [] as OutcomeEvent[],
     developmentEvents: [] as DevelopmentEvent[],
+    developmentJobs: [] as DevelopmentJobState[],
+    developmentDeferredSourceEventIds: [] as string[],
+    developmentProcessing: false,
     draft: { title: "", prose: "", claim: "", objective: "", choice: "", stakes: "consequential", reversible: "partial" } as Draft,
   };
 }
@@ -270,12 +310,125 @@ export const useLimen = create<LimenStore>()(
       ...blankData(),
       setAdaptiveEnabled: (enabled) => set({ adaptiveEnabled: enabled }),
       setDevelopmentEnabled: (enabled) => {
-        if (typeof enabled === "boolean") set({ developmentEnabled: enabled });
+        if (typeof enabled !== "boolean") return;
+        if (!enabled) developmentCycleEpoch += 1;
+        const next = { ...get(), developmentEnabled: enabled };
+        set({ developmentEnabled: enabled, ...queueEligibleDevelopmentWork(next) });
+        if (enabled) void get().runDevelopmentWork();
       },
       setLearningPaused: (paused) => {
         if (typeof paused !== "boolean" || get().learningPaused === paused) return;
+        if (paused) developmentCycleEpoch += 1;
         set({ learningPaused: paused });
+        if (!paused) {
+          set(queueEligibleDevelopmentWork(get()));
+          void get().runDevelopmentWork();
+        }
         refreshActive(set, get);
+      },
+      queueDevelopmentWork: () => set(queueEligibleDevelopmentWork(get())),
+      runDevelopmentWork: async () => {
+        if (developmentCycleRunning) { developmentCycleRerunRequested = true; return; }
+        if (!get().developmentEnabled || get().learningPaused) return;
+        developmentCycleRunning = true;
+        set({ developmentProcessing: true });
+        try {
+          for (let pass = 0; pass < 16; pass += 1) {
+            if (!get().developmentEnabled || get().learningPaused) break;
+            developmentCycleRerunRequested = false;
+            let madeProgress = false;
+            const current = get();
+            const cycle = await runDevelopmentCycle<DevelopmentEvent[]>({
+              state: { jobs: current.developmentJobs, deferredSourceEventIds: current.developmentDeferredSourceEventIds },
+              controls: () => {
+                const state = get();
+                return {
+                  enabled: state.developmentEnabled,
+                  paused: state.learningPaused,
+                  epoch: developmentCycleEpoch,
+                  inputVersion: DEVELOPMENT_JOB_INPUT_VERSION,
+                  sourceEventIds: new Set(state.developmentEvents.map((event) => event.id)),
+                };
+              },
+              processJob: async (job, budget) => prepareDevelopmentJob(get().developmentEvents, job, budget.maxSimulatedEpisodes, Date.now()),
+              commitPrepared: (job, result, completedState) => {
+                const latest = get();
+                if (!latest.developmentEnabled || latest.learningPaused
+                  || !latest.developmentJobs.some((row) => row.id === job.id && row.status === "queued")
+                  || !latest.developmentEvents.some((event) => event.id === job.sourceEventId)) return false;
+                const events = result.prepared ?? latest.developmentEvents;
+                const mergedJobs = mergeDevelopmentJobs(latest.developmentJobs, completedState.jobs);
+                const queued = queueEligibleDevelopmentWork({ ...latest, developmentEvents: events, developmentJobs: mergedJobs, developmentDeferredSourceEventIds: completedState.deferredSourceEventIds });
+                set(queued);
+                madeProgress = true;
+                return true;
+              },
+            });
+            const latest = get();
+            const recoveredById = new Map(cycle.state.jobs.map((job) => [job.id, job]));
+            const reconciled = latest.developmentJobs.map((job) => recoveredById.get(job.id) ?? job);
+            if (reconciled.some((job, index) => job.status !== latest.developmentJobs[index]?.status)) set({ developmentJobs: reconciled });
+            const hasPending = get().developmentJobs.some((job) => job.status === "queued");
+            if (!madeProgress || !hasPending) break;
+          }
+        } finally {
+          developmentCycleRunning = false;
+          set({ developmentProcessing: false });
+          const state = get();
+          if (developmentCycleRerunRequested && state.developmentEnabled && !state.learningPaused && state.developmentJobs.some((job) => job.status === "queued")) {
+            queueMicrotask(() => { void get().runDevelopmentWork(); });
+          }
+        }
+      },
+      runLocalRehearsal: async () => {
+        const initial = get();
+        if (!initial.developmentEnabled || initial.learningPaused || initial.developmentJobs.some((job) => job.status === "queued")) return;
+        // The first local rehearsal is reproducible for an inspectable product journey.
+        // Later rehearsals use fresh seeds so each contributes distinct simulated cases.
+        const hasPriorRehearsal = initial.developmentEvents.some((event) => event.kind === "expectation.recorded" && event.payload.expectation.track === "simulated");
+        const seed = hasPriorRehearsal ? `local-rehearsal:${uid()}` : "product-flow";
+        const at = Date.now();
+        const beforeIds = new Set(initial.developmentEvents.map((event) => event.id));
+        const events = createLocalRehearsalEvents(initial.developmentEvents, seed, at);
+        const added = events.filter((event) => !beforeIds.has(event.id));
+        const sources = added.filter((event) => event.kind === "expectation.resolved");
+        const queued = queueEligibleDevelopmentWork({ ...initial, developmentEvents: events }, sources);
+        set(queued);
+        await get().runDevelopmentWork();
+
+        const current = get();
+        if (!current.developmentEnabled || current.learningPaused) return;
+        const applicationEvents = createLocalRehearsalApplication(current.developmentEvents, seed, Date.now());
+        if (applicationEvents.length > current.developmentEvents.length) {
+          const newResolutions = applicationEvents.filter((event) => !current.developmentEvents.some((prior) => prior.id === event.id) && event.kind === "expectation.resolved");
+          set(queueEligibleDevelopmentWork({ ...current, developmentEvents: applicationEvents }, newResolutions));
+          await get().runDevelopmentWork();
+        }
+      },
+      retireDevelopmentPolicy: (policyVersionId) => {
+        const transition = prepareRetirement(get().developmentEvents, policyVersionId);
+        set({ developmentEvents: replayDevelopment([...get().developmentEvents, transition]).events });
+      },
+      deleteDevelopmentPolicy: (policyVersionId) => {
+        developmentCycleEpoch += 1;
+        const replay = replayDevelopment(get().developmentEvents);
+        const policy = replay.policies.find((row) => row.id === policyVersionId);
+        if (!policy) return;
+        const deletion: DevelopmentEvent = {
+          id: `delete-policy:${policy.id}:${replay.lastSequence + 1}`,
+          sequence: replay.lastSequence + 1,
+          at: Date.now(),
+          schemaVersion: 1,
+          kind: "dependency.deleted",
+          payload: { dependency: { kind: "policy", id: policy.id } },
+        };
+        const developmentEvents = replayDevelopment([...get().developmentEvents, deletion]).events;
+        const queue = recoverDevelopmentQueue(
+          { jobs: get().developmentJobs, deferredSourceEventIds: get().developmentDeferredSourceEventIds },
+          new Set(developmentEvents.map((event) => event.id)),
+          DEVELOPMENT_JOB_INPUT_VERSION,
+        );
+        set({ developmentEvents, developmentJobs: queue.jobs, developmentDeferredSourceEventIds: queue.deferredSourceEventIds });
       },
       setDraft: (draft) => set({ draft }),
       setView: (view) => set({ view }),
@@ -436,17 +589,19 @@ export const useLimen = create<LimenStore>()(
           expectationEvents = [made.event];
         }
         const receipt = checkReportArtifact(artifact, current.situation.id, runId, at);
-        if (expectation) {
+          if (expectation) {
           const resolvedEvents = resolveReportReceipt(expectation, receipt, replayDevelopment(get().developmentEvents).lastSequence + 2);
           const nextEvents = [...get().developmentEvents, ...expectationEvents, ...resolvedEvents];
           replayDevelopment(nextEvents);
-          set({ developmentEvents: nextEvents });
-        }
+          const sourceEvents = resolvedEvents.filter((event) => event.kind === "expectation.resolved");
+          set(queueEligibleDevelopmentWork({ ...get(), developmentEvents: nextEvents }, sourceEvents));
+          }
         const situation = {
           ...current.situation,
           receipts: [...(current.situation.receipts ?? []), receipt],
         };
         appendRevision(set, get, situation, "document checked", receipt.runId);
+        void get().runDevelopmentWork();
       },
       markSeat: (subRoleId, verdict) => {
         const current = currentPair(get());
@@ -539,6 +694,7 @@ export const useLimen = create<LimenStore>()(
         set({ sittings: get().sittings.map((s) => s.id === sitting.id ? { ...s, responses: [...(s.responses ?? []), response] } : s) });
       },
       deleteCase: (caseId) => {
+        developmentCycleEpoch += 1;
         const lastSequence = replayDevelopment(get().developmentEvents).lastSequence;
         const deletionEvent: DevelopmentEvent = {
           id: `delete-case:${caseId}:${lastSequence + 1}`,
@@ -549,6 +705,11 @@ export const useLimen = create<LimenStore>()(
           payload: { dependency: { kind: "case", id: caseId } },
         };
         const developmentEvents = replayDevelopment([...get().developmentEvents, deletionEvent]).events;
+        const recoveredQueue = recoverDevelopmentQueue(
+          { jobs: get().developmentJobs, deferredSourceEventIds: get().developmentDeferredSourceEventIds },
+          new Set(developmentEvents.map((event) => event.id)),
+          DEVELOPMENT_JOB_INPUT_VERSION,
+        );
         const retained = get().sittings.filter((s) => s.situationId !== caseId);
         const situations = get().situations.filter((s) => s.id !== caseId);
         const feedbackEvents = get().feedbackEvents.filter((e) => e.caseId !== caseId);
@@ -557,26 +718,28 @@ export const useLimen = create<LimenStore>()(
         const affectedMemoryIds = new Set(get().memories.filter((m) => removedRuns.has(m.sittingId) || m.validationCaseIds?.includes(caseId)).map((m) => m.id));
         const sittings = redactLearningReferences(retained, affectedMemoryIds, true);
         const roleEvents = get().roleEvents.filter((e) => e.caseId !== caseId);
-        set({ situations, sittings, memories, feedbackEvents, roleEvents, outcomeEvents: get().outcomeEvents.filter((e) => e.caseId !== caseId), developmentEvents, activeSittingId: removedRuns.has(get().activeSittingId ?? "") ? null : get().activeSittingId, ...deriveLearning(feedbackEvents, sittings, situations, roleEvents) });
+        set({ situations, sittings, memories, feedbackEvents, roleEvents, outcomeEvents: get().outcomeEvents.filter((e) => e.caseId !== caseId), developmentEvents, developmentJobs: recoveredQueue.jobs, developmentDeferredSourceEventIds: recoveredQueue.deferredSourceEventIds, activeSittingId: removedRuns.has(get().activeSittingId ?? "") ? null : get().activeSittingId, ...deriveLearning(feedbackEvents, sittings, situations, roleEvents) });
       },
       deleteMemory: (id) => set({ memories: get().memories.filter((m) => m.id !== id), sittings: redactLearningReferences(get().sittings, new Set([id]), false) }),
       importData: (json) => {
         const result = parseImport(json, get());
+        developmentCycleEpoch += 1;
         set(result.merged);
         return result.preview;
       },
       release: () => {
+        developmentCycleEpoch += 1;
         void useLimen.persist.clearStorage();
         set({ ...blankData() });
       },
     }),
     {
       name: "limen-v1",
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => guardedStorage),
       skipHydration: true,
       migrate: (state, version) => {
-        const data = version === 2 ? migrateV2(state) : migrateLegacy(state);
+        const data = version === 3 ? migrateV3(state) : version === 2 ? migrateV2(state) : migrateLegacy(state);
         return { ...data, ...deriveLearning(data.feedbackEvents, data.sittings, data.situations) };
       },
       merge: (persisted, current) => {
@@ -605,6 +768,8 @@ export const useLimen = create<LimenStore>()(
         roleBias: state.roleBias,
         outcomeEvents: state.outcomeEvents,
         developmentEvents: state.developmentEvents,
+        developmentJobs: state.developmentJobs,
+        developmentDeferredSourceEventIds: state.developmentDeferredSourceEventIds,
         draft: state.draft,
       }),
     },

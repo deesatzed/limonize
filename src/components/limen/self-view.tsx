@@ -4,6 +4,7 @@ import { QUESTION_PANEL } from "@/lib/limen/questions";
 import { idleLines, useLimen } from "@/lib/limen/store";
 import { DataControls } from "./data-controls";
 import { CharterPanel } from "./charter-panel";
+import { DevelopmentPanel } from "./development-panel";
 
 const SIGNALS: [string, string][] = [
   ["", "No automatic link"],
@@ -82,6 +83,7 @@ export function SelfView() {
         </p>
       </header>
       <CharterPanel />
+      <DevelopmentPanel />
       <DataControls />
       <section className="border-t border-line pt-6"><h2 className="font-serif text-2xl">Adaptive preferences</h2><p className="mt-2 text-sm text-muted">Off by default. Marks are retained for review, but do not steer recommendations unless you enable this experiment. Local synthetic evaluation does not establish better decisions.{learningPaused ? " Learned influence is paused; resume it above to use these preferences." : ""}</p><button type="button" disabled={learningPaused} aria-pressed={adaptiveEnabled} onClick={() => setAdaptiveEnabled(!adaptiveEnabled)} className="mt-3 min-h-11 rounded-sm bg-bg-raised px-4 text-fg disabled:opacity-50">{adaptiveEnabled ? "Turn adaptive preferences off" : "Turn adaptive preferences on"}</button></section>
 

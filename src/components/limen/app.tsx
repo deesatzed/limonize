@@ -17,10 +17,16 @@ const NAV: { id: ViewId; label: string; icon: typeof Eye }[] = [
 
 export function LimenApp() {
   const [issue, setIssue] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
   useEffect(() => {
     const refresh = () => setIssue(storageIssue());
     window.addEventListener("limen-storage-issue", refresh);
-    void Promise.resolve(useLimen.persist.rehydrate()).catch(refresh).finally(refresh);
+    void Promise.resolve(useLimen.persist.rehydrate()).catch(refresh).finally(() => {
+      refresh();
+      useLimen.getState().queueDevelopmentWork();
+      void useLimen.getState().runDevelopmentWork();
+      setReady(true);
+    });
     return () => window.removeEventListener("limen-storage-issue", refresh);
   }, []);
 
@@ -41,7 +47,7 @@ export function LimenApp() {
   const attention = sittings.find((x) => x.id === activeId)?.result.attention ?? "quiet";
 
   return (
-    <div className="min-h-screen bg-bg text-fg">
+    <div className="min-h-screen bg-bg text-fg" data-limen-ready={ready ? "true" : "false"}>
       <div className="md:grid md:grid-cols-[17rem_1fr]">
         <aside className="hidden border-r border-line md:sticky md:top-0 md:flex md:h-screen md:flex-col md:justify-between md:px-6 md:py-8">
           <div>

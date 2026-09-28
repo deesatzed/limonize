@@ -1,0 +1,1876 @@
+{
+  "runId": "development-d5d0b9d6-51e9-4077-8ec1-4797063eac91",
+  "phase": "development",
+  "createdAt": "2026-09-27T11:38:51.777Z",
+  "manifestSha256": "d5d5ddb94383d990c838177926d084b1927088d2ba1865f926d60542bd45e98d",
+  "scorerVersion": "luna-scorer-v1",
+  "configuration": {
+    "armIds": [
+      "frozen_enhanced_baseline",
+      "fixed_checklist",
+      "matched_raw_history",
+      "learned_profile_commitments",
+      "no_profile_ablation",
+      "stale_profile",
+      "shuffled_profile"
+    ],
+    "caseIds": [
+      "ae-dev-01",
+      "ae-dev-02",
+      "sd-dev-01",
+      "sd-dev-02",
+      "cv-dev-01",
+      "cv-dev-02",
+      "quiet-dev-01",
+      "quiet-dev-02"
+    ],
+    "observationBudget": 2,
+    "costUnits": {
+      "check-acceptance": 1,
+      "trace-lineage": 1
+    },
+    "developmentCaseIds": [
+      "ae-dev-01",
+      "ae-dev-02",
+      "sd-dev-01",
+      "sd-dev-02",
+      "cv-dev-01",
+      "cv-dev-02",
+      "quiet-dev-01",
+      "quiet-dev-02"
+    ],
+    "activeLearnedPolicies": []
+  },
+  "runCount": 56,
+  "runs": [
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "ae-dev-01",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-01-1",
+          "caseId": "ae-dev-01",
+          "runId": "luna-test:ae-dev-01:frozen_enhanced_baseline",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "ae-dev-01",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "check-acceptance"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-01-1",
+          "caseId": "ae-dev-01",
+          "runId": "luna-test:ae-dev-01:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "ae-dev-01",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-01-1",
+          "caseId": "ae-dev-01",
+          "runId": "luna-test:ae-dev-01:matched_raw_history",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "ae-dev-01",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-01-1",
+          "caseId": "ae-dev-01",
+          "runId": "luna-test:ae-dev-01:learned_profile_commitments",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "ae-dev-01",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-01-1",
+          "caseId": "ae-dev-01",
+          "runId": "luna-test:ae-dev-01:no_profile_ablation",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "ae-dev-01",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-01-1",
+          "caseId": "ae-dev-01",
+          "runId": "luna-test:ae-dev-01:stale_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "ae-dev-01",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-01-1",
+          "caseId": "ae-dev-01",
+          "runId": "luna-test:ae-dev-01:shuffled_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "ae-dev-02",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-02-1",
+          "caseId": "ae-dev-02",
+          "runId": "luna-test:ae-dev-02:frozen_enhanced_baseline",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "ae-dev-02",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "check-acceptance"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-02-1",
+          "caseId": "ae-dev-02",
+          "runId": "luna-test:ae-dev-02:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "ae-dev-02",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-02-1",
+          "caseId": "ae-dev-02",
+          "runId": "luna-test:ae-dev-02:matched_raw_history",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "ae-dev-02",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-02-1",
+          "caseId": "ae-dev-02",
+          "runId": "luna-test:ae-dev-02:learned_profile_commitments",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "ae-dev-02",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-02-1",
+          "caseId": "ae-dev-02",
+          "runId": "luna-test:ae-dev-02:no_profile_ablation",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "ae-dev-02",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-02-1",
+          "caseId": "ae-dev-02",
+          "runId": "luna-test:ae-dev-02:stale_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "ae-dev-02",
+      "split": "development",
+      "family": "acceptance_execution",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-ae-dev-02-1",
+          "caseId": "ae-dev-02",
+          "runId": "luna-test:ae-dev-02:shuffled_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-ae-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-ae-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "sd-dev-01",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-01-1",
+          "caseId": "sd-dev-01",
+          "runId": "luna-test:sd-dev-01:frozen_enhanced_baseline",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "sd-dev-01",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-01-1",
+          "caseId": "sd-dev-01",
+          "runId": "luna-test:sd-dev-01:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "sd-dev-01",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-01-1",
+          "caseId": "sd-dev-01",
+          "runId": "luna-test:sd-dev-01:matched_raw_history",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "sd-dev-01",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-01-1",
+          "caseId": "sd-dev-01",
+          "runId": "luna-test:sd-dev-01:learned_profile_commitments",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "sd-dev-01",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-01-1",
+          "caseId": "sd-dev-01",
+          "runId": "luna-test:sd-dev-01:no_profile_ablation",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "sd-dev-01",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-01-1",
+          "caseId": "sd-dev-01",
+          "runId": "luna-test:sd-dev-01:stale_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "sd-dev-01",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-01-1",
+          "caseId": "sd-dev-01",
+          "runId": "luna-test:sd-dev-01:shuffled_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "sd-dev-02",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-02-1",
+          "caseId": "sd-dev-02",
+          "runId": "luna-test:sd-dev-02:frozen_enhanced_baseline",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "sd-dev-02",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-02-1",
+          "caseId": "sd-dev-02",
+          "runId": "luna-test:sd-dev-02:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "sd-dev-02",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-02-1",
+          "caseId": "sd-dev-02",
+          "runId": "luna-test:sd-dev-02:matched_raw_history",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "sd-dev-02",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-02-1",
+          "caseId": "sd-dev-02",
+          "runId": "luna-test:sd-dev-02:learned_profile_commitments",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "sd-dev-02",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-02-1",
+          "caseId": "sd-dev-02",
+          "runId": "luna-test:sd-dev-02:no_profile_ablation",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "sd-dev-02",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-02-1",
+          "caseId": "sd-dev-02",
+          "runId": "luna-test:sd-dev-02:stale_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "sd-dev-02",
+      "split": "development",
+      "family": "source_dependence",
+      "baselineCheckId": "trace-lineage",
+      "checks": [
+        "trace-lineage"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-sd-dev-02-1",
+          "caseId": "sd-dev-02",
+          "runId": "luna-test:sd-dev-02:shuffled_profile",
+          "track": "simulated",
+          "expectationId": "luna-expectation-sd-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-sd-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "cv-dev-01",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "cv-dev-01",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [
+        "trace-lineage",
+        "check-acceptance"
+      ],
+      "costUnits": 2,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-cv-dev-01-1",
+          "caseId": "cv-dev-01",
+          "runId": "luna-test:cv-dev-01:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-cv-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-cv-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        },
+        {
+          "id": "luna-observation-cv-dev-01-2",
+          "caseId": "cv-dev-01",
+          "runId": "luna-test:cv-dev-01:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-cv-dev-01-2",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-cv-dev-01-2",
+            "worldVersion": "luna-world-v2"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 2,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "cv-dev-01",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [
+        "check-acceptance"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-cv-dev-01-1",
+          "caseId": "cv-dev-01",
+          "runId": "luna-test:cv-dev-01:matched_raw_history",
+          "track": "simulated",
+          "expectationId": "luna-expectation-cv-dev-01-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-cv-dev-01-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "cv-dev-01",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "cv-dev-01",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "cv-dev-01",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": true,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "cv-dev-01",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "cv-dev-02",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "cv-dev-02",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [
+        "trace-lineage",
+        "check-acceptance"
+      ],
+      "costUnits": 2,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-cv-dev-02-1",
+          "caseId": "cv-dev-02",
+          "runId": "luna-test:cv-dev-02:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-cv-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-cv-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "supports"
+        },
+        {
+          "id": "luna-observation-cv-dev-02-2",
+          "caseId": "cv-dev-02",
+          "runId": "luna-test:cv-dev-02:fixed_checklist",
+          "track": "simulated",
+          "expectationId": "luna-expectation-cv-dev-02-2",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-cv-dev-02-2",
+            "worldVersion": "luna-world-v2"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 2,
+        "constraintViolations": 0,
+        "successfulResolution": true
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "cv-dev-02",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [
+        "check-acceptance"
+      ],
+      "costUnits": 1,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [
+        {
+          "id": "luna-observation-cv-dev-02-1",
+          "caseId": "cv-dev-02",
+          "runId": "luna-test:cv-dev-02:matched_raw_history",
+          "track": "simulated",
+          "expectationId": "luna-expectation-cv-dev-02-1",
+          "source": {
+            "kind": "simulation_release",
+            "sourceId": "luna-check-cv-dev-02-1",
+            "worldVersion": "luna-world-v1"
+          },
+          "status": "simulated",
+          "result": "contradicts"
+        }
+      ],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 1,
+        "checkCost": 1,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "cv-dev-02",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "cv-dev-02",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "cv-dev-02",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": true,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "cv-dev-02",
+      "split": "development",
+      "family": "context_change",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": true,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "quiet-dev-01",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "quiet-dev-01",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "quiet-dev-01",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "quiet-dev-01",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "quiet-dev-01",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "quiet-dev-01",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "quiet-dev-01",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "frozen_enhanced_baseline",
+      "caseId": "quiet-dev-02",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "fixed_checklist",
+      "caseId": "quiet-dev-02",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "matched_raw_history",
+      "caseId": "quiet-dev-02",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "learned_profile_commitments",
+      "caseId": "quiet-dev-02",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "no_profile_ablation",
+      "caseId": "quiet-dev-02",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "stale_profile",
+      "caseId": "quiet-dev-02",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    },
+    {
+      "armId": "shuffled_profile",
+      "caseId": "quiet-dev-02",
+      "split": "development",
+      "family": "quiet",
+      "baselineCheckId": null,
+      "checks": [],
+      "costUnits": 0,
+      "policyVersionIds": [],
+      "contributed": false,
+      "attemptedStale": false,
+      "observations": [],
+      "score": {
+        "consequentialMiss": false,
+        "invalidRevision": false,
+        "unnecessaryChecks": 0,
+        "checkCost": 0,
+        "constraintViolations": 0,
+        "successfulResolution": false
+      }
+    }
+  ],
+  "summary": {
+    "frozen_enhanced_baseline": {
+      "cases": 8,
+      "totalCost": 4,
+      "consequentialMisses": 4,
+      "invalidRevisions": 0,
+      "constraintViolations": 0,
+      "successfulResolutions": 2,
+      "unnecessaryChecks": 2,
+      "changedSelections": 0,
+      "staleAttempts": 0
+    },
+    "fixed_checklist": {
+      "cases": 8,
+      "totalCost": 8,
+      "consequentialMisses": 2,
+      "invalidRevisions": 0,
+      "constraintViolations": 0,
+      "successfulResolutions": 4,
+      "unnecessaryChecks": 4,
+      "changedSelections": 0,
+      "staleAttempts": 0
+    },
+    "matched_raw_history": {
+      "cases": 8,
+      "totalCost": 6,
+      "consequentialMisses": 3,
+      "invalidRevisions": 0,
+      "constraintViolations": 0,
+      "successfulResolutions": 3,
+      "unnecessaryChecks": 3,
+      "changedSelections": 0,
+      "staleAttempts": 0
+    },
+    "learned_profile_commitments": {
+      "cases": 8,
+      "totalCost": 4,
+      "consequentialMisses": 4,
+      "invalidRevisions": 0,
+      "constraintViolations": 0,
+      "successfulResolutions": 2,
+      "unnecessaryChecks": 2,
+      "changedSelections": 0,
+      "staleAttempts": 0
+    },
+    "no_profile_ablation": {
+      "cases": 8,
+      "totalCost": 4,
+      "consequentialMisses": 4,
+      "invalidRevisions": 0,
+      "constraintViolations": 0,
+      "successfulResolutions": 2,
+      "unnecessaryChecks": 2,
+      "changedSelections": 0,
+      "staleAttempts": 0
+    },
+    "stale_profile": {
+      "cases": 8,
+      "totalCost": 4,
+      "consequentialMisses": 4,
+      "invalidRevisions": 0,
+      "constraintViolations": 0,
+      "successfulResolutions": 2,
+      "unnecessaryChecks": 2,
+      "changedSelections": 0,
+      "staleAttempts": 2
+    },
+    "shuffled_profile": {
+      "cases": 8,
+      "totalCost": 4,
+      "consequentialMisses": 4,
+      "invalidRevisions": 0,
+      "constraintViolations": 0,
+      "successfulResolutions": 2,
+      "unnecessaryChecks": 2,
+      "changedSelections": 0,
+      "staleAttempts": 0
+    }
+  }
+}

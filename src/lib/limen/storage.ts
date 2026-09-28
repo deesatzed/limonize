@@ -1,5 +1,5 @@
 import type { StateStorage } from "zustand/middleware";
-import { MAX_DATA_BYTES, migrateLegacy, utf8ByteLength, validateData } from "./data";
+import { MAX_DATA_BYTES, migrateLegacy, migrateV3, utf8ByteLength, validateData } from "./data";
 
 let issue: string | null = null;
 let recoverableRaw: string | null = null;
@@ -21,7 +21,8 @@ export const guardedStorage: StateStorage = {
       const envelope: unknown = JSON.parse(raw);
       if (!envelope || typeof envelope !== "object" || !("state" in envelope)) throw new Error("Stored data has no state.");
       const record = envelope as { state: unknown; version?: number };
-      if (record.version === 3) return JSON.stringify({ version: 3, state: validateData(record.state) });
+      if (record.version === 4) return JSON.stringify({ version: 4, state: validateData(record.state) });
+      else if (record.version === 3) return JSON.stringify({ version: 3, state: migrateV3(record.state) });
       else if (record.version === 2) return JSON.stringify({ version: 2, state: validateData(record.state) });
       else if (record.version === 0 || record.version === undefined) migrateLegacy(record.state);
       else throw new Error("Stored data has a newer, unsupported version.");

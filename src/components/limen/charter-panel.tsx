@@ -36,8 +36,7 @@ export function CharterPanel() {
         </button>
       </div>
       <p className="mt-3 text-sm text-faint">
-        Current capability: local reflection and conditional lesson retrieval. Adaptive preferences remain opt-in;
-        the full autonomous policy development cycle is planned. External model requests are disabled.
+        Current capability: local reflection, conditional lesson retrieval, and bounded policy development. Adaptive preferences remain opt-in; learned policies stay advisory in real cases and shadowed in simulation under the current comparative gate. External model requests are disabled.
       </p>
     </section>
   );

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "frozen-protected-result-benefit-failed-simulation-shadow",
+  "status": "frozen-contract-comparison-ready",
   "worldVersion": "luna-world-v1",
   "scorerVersion": "luna-scorer-v1",
   "observationBudget": 2,
@@ -33,14 +33,8 @@
       "src/lib/limen/competence.ts": "bb44f8287045c2206c9bbc5e4034d552dcef7d21f94b121dba80d98f03294424",
       "src/lib/limen/commitments.ts": "e6ccaac92c2de058790fb2b2cf62baf421a330264360e3c143d80a5aeed09f2b",
       "src/lib/limen/policy-review.ts": "083ce719797802c9fa12485fe6c33c4a3dadac2b645d9a5ed0d3cfa3f68d91cb",
-      "src/lib/limen/development-worker.ts": "592da0e16801b7f8787fdac63a262c43fe7889d500756c0a7a46da84f558665b",
-      "src/lib/limen/selection.ts": "fd2124bb11f677707c652b90e793c2a2a52cd8dab486926b05a73ac4fdafafe0",
-      "src/lib/limen/scope-disposition.ts": "fa262d11ee5fb0346b1705fc1010c60eb9cea2925824591624bbb2bc5dec995c"
+      "src/lib/limen/development-worker.ts": "5c46b462b365cc68417140ff3055afc6c547c66fbb1c3c1ed8b3cbe645361023",
+      "src/lib/limen/selection.ts": "fd2124bb11f677707c652b90e793c2a2a52cd8dab486926b05a73ac4fdafafe0"
     }
-  },
-  "scopeDisposition": {
-    "simulation": "shadow",
-    "protectedRunId": "protected-fa96aa05-7e95-4285-8dcd-1ea8fe6106b9",
-    "reason": "Learned policies tied the frozen baseline and had more consequential misses than the fixed checklist; no learned contribution was recorded."
   }
 }

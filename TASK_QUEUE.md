@@ -28,7 +28,7 @@ This is a separate completed local change following the six enhancements. Govern
 
 [A0–A11](docs/plans/2026-09-23-autonomous-development-plan.md) remain proposed implementation work. The agreed direction includes both real and simulated experience, context-sensitive automatic/advisory behavior and autonomous reversible policy development. Charter integration supplies boundaries and current controls; it does not implement the expectation/competence/commitment cycle or establish its benefit.
 
-## Luna execution goal — active
+## Luna execution goal — active; final publication in progress
 
 [GOAL_LUNA.md](GOAL_LUNA.md) is the user-requested execution contract for the next milestone. Follow [the runbook](docs/plans/2026-09-26-luna-execution.md) sequentially when invoked. Publication is to the goal branch; no main merge or deployment is included.
 
@@ -42,10 +42,10 @@ This is a separate completed local change following the six enhancements. Govern
 | L05 | Sequential worlds, separate scorer and frozen controls | done — bounded simulated worlds, separate evaluator/scorer, 16 fixed variants, seven arms and hash-checked preflight |
 | L06 | Evidence-derived competence and candidate commitments | done — event-derived profiles, independent family support, inert candidates and reconsideration conditions pass |
 | L07 | Reviewed admission and coherent selection | done — three-review simulation gate, prospective controls, pause/context-aware selection and attributed store applications pass |
-| L08 | Bounded autonomous queue and recovery | in progress |
-| L09 | Integrated product and rehearsal flow | queued |
-| L10 | Comparative evaluation and scope disposition | queued |
-| L11 | Final tests/build/browser proof | queued |
-| L12 | Report, commit, push and remote verification | queued |
+| L08 | Bounded autonomous queue and recovery | done — persistent app-open runner, scoped simulation worker, pause/recovery and full worker lifecycle tests |
+| L09 | Integrated product and rehearsal flow | done — desktop/mobile flow exposes candidate reviews and trial evidence |
+| L10 | Comparative evaluation and scope disposition | done — protected result does not meet benefit gate; simulation steering is shadowed |
+| L11 | Final tests/build/browser proof | done — current tests, typecheck, lint, isolated legacy evaluation/build, protected preflight, development-only evaluation, and dev/built desktop/mobile browser proof passed; screenshots visually inspected |
+| L12 | Report, commit, push and remote verification | in progress — final report reconciled; commit and branch publication remain |
 
 These tasks implement a bounded slice of the wider development roadmap. Record partial A-task coverage explicitly; do not mark all A0–A11 done when this milestone completes.

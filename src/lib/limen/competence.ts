@@ -31,9 +31,12 @@ export function deriveCompetence(events: readonly DevelopmentEvent[]): DerivedCo
   const replay = replayDevelopment(events);
   const expectationById = new Map(replay.expectations.map((row) => [row.id, row]));
   const observationsById = new Map(replay.observations.map((row) => [row.id, row]));
+  // Prospective trials are admission evidence, not new discovery support for a policy version.
+  const prospectiveTrialResolutionIds = new Set(replay.trials.map((row) => row.resolutionId));
   const groups = new Map<string, DerivedCompetence>();
 
   for (const resolution of replay.resolutions) {
+    if (prospectiveTrialResolutionIds.has(resolution.id)) continue;
     const expectation = expectationById.get(resolution.expectationId);
     if (!expectation) continue;
     const key = stable({ track: resolution.track, context: expectation.context, actionId: expectation.actionId });

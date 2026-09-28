@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLimen } from "@/lib/limen/store";
+import { replayDevelopment } from "@/lib/limen/development";
 import { effectiveFeedback } from "@/lib/limen/ledger";
 import { EXTERNAL_REFLECTION_DISABLED } from "@/lib/limen/charter";
 import { OutcomePanel } from "./outcome-panel";
@@ -74,6 +75,10 @@ export function MindView() {
   const sitting = useLimen((s) => s.sittings.find((x) => x.id === activeId));
   const situation = useLimen((s) => sitting?.snapshot ?? (sitting ? s.situations.find((x) => x.id === sitting.situationId) : undefined));
   const setView = useLimen((s) => s.setView);
+  const developmentEvents = useLimen((s) => s.developmentEvents);
+  const development = useMemo(() => replayDevelopment(developmentEvents), [developmentEvents]);
+  const latestApplication = development.applications.at(-1);
+  const latestPolicy = latestApplication && development.policies.find((policy) => policy.id === latestApplication.policyVersionId);
 
   if (!sitting || !situation) {
     return (
@@ -89,11 +94,31 @@ export function MindView() {
         >
           Bring something
         </button>
+        {latestApplication && latestPolicy ? <SimulationApplication application={latestApplication} policy={latestPolicy} /> : null}
       </div>
     );
   }
 
-  return <MindBody key={sitting.id} situation={situation} sitting={sitting} />;
+  return <div className="space-y-10"><MindBody key={sitting.id} situation={situation} sitting={sitting} />{latestApplication && latestPolicy ? <SimulationApplication application={latestApplication} policy={latestPolicy} /> : null}</div>;
+}
+
+function SimulationApplication({ application, policy }: {
+  application: import("@/lib/limen/development").PolicyApplicationRecord;
+  policy: import("@/lib/limen/development").PolicyVersionView;
+}) {
+  return (
+    <section className="mx-auto w-full max-w-3xl border-t border-line pt-6" aria-labelledby="simulation-application-title">
+      <p className="text-xs font-semibold tracking-widest text-copper uppercase">Simulated · local rehearsal</p>
+      <h2 id="simulation-application-title" className="mt-2 font-serif text-2xl text-fg">A later check selection</h2>
+      <p className="mt-2 text-sm leading-relaxed text-muted">The active, context-matched policy changed the available check in this new simulated case. This is functional evidence of contribution, not a measured benefit claim.</p>
+      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+        <div><dt className="text-faint">Baseline</dt><dd className="mt-1 text-fg">{application.baselineCheckId}</dd></div>
+        <div><dt className="text-faint">Selected</dt><dd className="mt-1 text-fg">{application.selectedCheckId}</dd></div>
+        <div><dt className="text-faint">Policy version</dt><dd className="mt-1 break-all text-fg">{policy.id}</dd></div>
+        <div><dt className="text-faint">Supporting source events</dt><dd className="mt-1 break-all text-fg">{application.sourceEventIds.join(", ")}</dd></div>
+      </dl>
+    </section>
+  );
 }
 
 function MindBody({ situation, sitting }: { situation: Situation; sitting: Sitting }) {
@@ -660,7 +685,7 @@ function ClerkPanel({ router, jev, selection }: { router: RouterChoice; jev: Jev
         {selection?.contributed ? "An admitted, context-matched simulation policy changed this check." : router.fromLearning ? "Chosen from the existing adaptive-mark experiment." : "Chosen from the prior; no learned check preference changed it."}{" "}
         Then the roles: {router.roles?.length ? router.roles.join(", ") : "none"}. The fly tag did not make this choice.
       </p>
-      {selection ? <p className="mt-2 text-xs text-faint">Simulation selection record: baseline {selection.baselineCheckId ?? "none"}; selected {selection.selectedCheckId ?? "none"}; eligible {selection.eligibleChecks.join(", ") || "none"}; cost {selection.costUnits}. Policy {selection.policyVersionIds.join(", ") || "none"}.</p> : null}
+      {selection ? <div className="mt-2 space-y-1 text-xs text-faint"><p>Simulation selection record: baseline {selection.baselineCheckId ?? "none"}; selected {selection.selectedCheckId ?? "none"}; eligible {selection.eligibleChecks.join(", ") || "none"}; cost {selection.costUnits}.</p><p>Source policy versions: {selection.policyVersionIds.join(", ") || "none"}. Supporting resolutions: {selection.supportResolutionIds.join(", ") || "none"}.</p><p>{selection.reason}</p></div> : null}
       <div className="mt-6 space-y-4">
         <p className="text-sm text-muted">
           Jev-style questions, run locally. Not TypeSafe Jev, not calibrated, and not a model seat. A classifier over

@@ -32,5 +32,30 @@ The baseline snapshot is the enhanced P0 engine at commit
 `e784b440028e9c063b78af92f1e5b7fa11318ee0`, kept separate from the original
 `evaluation/baseline/`. The manifest records snapshot hashes. Run
 `npm run eval:luna -- --preflight` to validate file hashes, arms, split sizes,
-world version, costs, and budget without loading hidden labels. Full scoring is
-reserved for L10.
+world version, costs, and budget without loading hidden labels. The development
+command `npm run eval:luna` writes an immutable development-only run. Inspect
+all cases, failures, and costs before using the protected command once:
+
+```sh
+npm run eval:luna -- --protected --development-run=evaluation/luna/results/development-<run-id>.json
+```
+
+The protected run requires the exact frozen manifest hash recorded in the
+reviewed development artifact. Results are stored as immutable run-ID JSON
+files under `evaluation/luna/results/`; the learner receives released,
+attributed observations only. The evaluator-only labels and independent scorer
+are loaded only during full scoring, never in preflight or browser code.
+
+The P0 enhanced baseline is adapted to the two permitted check IDs using its
+existing router/action output. Fixed checklist, matched raw-history, learned
+profile/commitment, no-profile, stale-profile, and shuffled-profile controls
+are registered separately. If development evidence is balanced and produces
+no policy, learned and ablation arms may legitimately match; that is a
+negative/inconclusive result, not evidence of benefit.
+
+The first protected run (`protected-fa96aa05-7e95-4285-8dcd-1ea8fe6106b9`)
+did not pass the frozen gate: learned policies tied the P0 baseline and had
+more consequential misses than the fixed checklist on this small synthetic
+set. The runtime therefore keeps the simulation scope in `shadow`, recorded
+in `src/lib/limen/scope-disposition.ts`. This bounded engineering result is not
+a general performance estimate.

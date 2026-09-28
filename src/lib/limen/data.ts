@@ -3,12 +3,13 @@ import type { LimenStore } from "./store";
 import { deriveLearning } from "./ledger";
 import { replayDevelopment, type DevelopmentEvent } from "./development";
 import { verifyCheckReceipt } from "./expectations";
+import { DEVELOPMENT_JOB_INPUT_VERSION, recoverDevelopmentQueue, type DevelopmentCycleState, type DevelopmentJobState } from "./development-cycle";
 
-export const DATA_VERSION = 3;
+export const DATA_VERSION = 4;
 export const MAX_DATA_BYTES = 2_000_000;
 export const utf8ByteLength = (value: string): number => new TextEncoder().encode(value).byteLength;
-type Data = Pick<LimenStore, "situations" | "sittings" | "memories" | "feedbackEvents" | "roleEvents" | "outcomeEvents" | "developmentEvents" | "blindspots" | "reflexes" | "draft" | "view" | "activeSittingId" | "adaptiveEnabled" | "developmentEnabled" | "learningPaused" | "roleBias">;
-type Envelope = { format: "limen-data"; version: 3; exportedAt: number; data: Data };
+type Data = Pick<LimenStore, "situations" | "sittings" | "memories" | "feedbackEvents" | "roleEvents" | "outcomeEvents" | "developmentEvents" | "developmentJobs" | "developmentDeferredSourceEventIds" | "blindspots" | "reflexes" | "draft" | "view" | "activeSittingId" | "adaptiveEnabled" | "developmentEnabled" | "learningPaused" | "roleBias">;
+type Envelope = { format: "limen-data"; version: 4; exportedAt: number; data: Data };
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
 const string = (v: unknown): v is string => typeof v === "string" && v.length <= 20_000;
 const idsUnique = (rows: { id: string }[]) => new Set(rows.map((row) => row.id)).size === rows.length;
@@ -23,9 +24,36 @@ export function validateData(raw: unknown): Data {
   const developmentEvents = raw.developmentEvents === undefined ? [] : raw.developmentEvents;
   if (!Array.isArray(developmentEvents) || developmentEvents.length > 100_000) throw new Error("Invalid developmentEvents collection.");
   const replay = replayDevelopment(developmentEvents);
+  const rawJobs = raw.developmentJobs === undefined ? [] : raw.developmentJobs;
+  if (!Array.isArray(rawJobs) || rawJobs.length > 5_000) throw new Error("Invalid developmentJobs collection.");
+  const jobs: DevelopmentJobState[] = rawJobs.map((value) => {
+    if (!object(value) || !string(value.id) || !string(value.sourceEventId) || !string(value.inputVersion)
+      || !["derive_competence", "consider_policy", "trial_policy"].includes(String(value.jobKind))
+      || !["queued", "completed", "cancelled"].includes(String(value.status))
+      || typeof value.createdAt !== "number" || !Number.isFinite(value.createdAt) || value.createdAt < 0
+      || (value.completedAt !== undefined && (typeof value.completedAt !== "number" || !Number.isFinite(value.completedAt) || value.completedAt < 0))) throw new Error("Invalid development job record.");
+    return {
+      id: value.id,
+      sourceEventId: value.sourceEventId,
+      jobKind: value.jobKind as DevelopmentJobState["jobKind"],
+      inputVersion: value.inputVersion,
+      status: value.status as DevelopmentJobState["status"],
+      createdAt: value.createdAt,
+      ...(value.completedAt === undefined ? {} : { completedAt: value.completedAt as number }),
+    };
+  });
+  if (new Set(jobs.map((job) => job.id)).size !== jobs.length) throw new Error("Duplicate development job IDs.");
+  if (jobs.filter((job) => job.status === "queued").length > 100) throw new Error("Pending development queue exceeds its 100 job limit.");
+  const deferred = raw.developmentDeferredSourceEventIds === undefined ? [] : raw.developmentDeferredSourceEventIds;
+  if (!Array.isArray(deferred) || deferred.length > 100_000 || deferred.some((id) => !string(id) || !id)) throw new Error("Invalid deferred development source list.");
+  const cycle: DevelopmentCycleState = recoverDevelopmentQueue(
+    { jobs, deferredSourceEventIds: [...new Set(deferred as string[])] },
+    new Set(replay.events.map((event) => event.id)),
+    DEVELOPMENT_JOB_INPUT_VERSION,
+  );
   const developmentEnabled = raw.developmentEnabled === true;
   if (raw.developmentEnabled !== undefined && typeof raw.developmentEnabled !== "boolean") throw new Error("Invalid development setting.");
-  const data = { ...(raw as unknown as Data), developmentEvents: replay.events, developmentEnabled };
+  const data = { ...(raw as unknown as Data), developmentEvents: replay.events, developmentEnabled, developmentJobs: cycle.jobs, developmentDeferredSourceEventIds: cycle.deferredSourceEventIds };
   for (const situation of data.situations) {
     if (!string(situation.title) || !string(situation.prose) || !string(situation.claim) || !string(situation.objective) || !string(situation.choice) || !["case", "self"].includes(situation.mode) || !object(situation.answers)) throw new Error("Invalid case content.");
   }
@@ -53,15 +81,23 @@ export function validateData(raw: unknown): Data {
     for (const response of sitting.responses ?? []) if (response.caseId !== sitting.situationId || response.runId !== sitting.id) throw new Error("Response attribution mismatch.");
   }
   const runs = new Map(data.sittings.map((s) => [s.id, s]));
+  const validateCaseRunLink = (track: "real" | "simulated", caseId: string, runId: string, record: string) => {
+    const sitting = runs.get(runId);
+    const caseExists = data.situations.some((situation) => situation.id === caseId);
+    if (track === "real" || sitting || caseExists) {
+      if (!sitting || sitting.situationId !== caseId || !caseExists) throw new Error(`${record} references a missing or mismatched case/run.`);
+    }
+  };
   for (const event of replay.events) {
     if (event.kind === "expectation.recorded") {
       const { expectation } = event.payload;
-      if (runs.get(expectation.runId)?.situationId !== expectation.caseId) throw new Error("Development expectation references a missing or mismatched case/run.");
+      validateCaseRunLink(expectation.track, expectation.caseId, expectation.runId, "Development expectation");
     }
     if (event.kind === "observation.released") {
       const { observation } = event.payload;
-      if (runs.get(observation.runId)?.situationId !== observation.caseId) throw new Error("Development observation references a missing or mismatched case/run.");
+      validateCaseRunLink(observation.track, observation.caseId, observation.runId, "Development observation");
       if (observation.source.kind === "check_receipt") {
+        if (observation.track !== "real") throw new Error("A simulated observation cannot claim a real check receipt.");
         const source = receipts.get(observation.source.sourceId);
         if (!source || source.sitting.situationId !== observation.caseId || source.sitting.id !== observation.runId) throw new Error("Development observation references a missing or mismatched check receipt.");
         verifyCheckReceipt(source.receipt);
@@ -87,6 +123,7 @@ export function validateData(raw: unknown): Data {
     blindspots: data.blindspots, reflexes: data.reflexes, draft: data.draft,
     view: data.view, activeSittingId: data.activeSittingId, adaptiveEnabled: data.adaptiveEnabled,
     learningPaused: raw.learningPaused === true, developmentEnabled, developmentEvents: replay.events, roleBias: data.roleBias,
+    developmentJobs: cycle.jobs, developmentDeferredSourceEventIds: cycle.deferredSourceEventIds,
   };
 }
 
@@ -107,6 +144,8 @@ export function exportData(state: LimenStore, selectedCaseIds?: string[]): strin
     draft: selected ? { title: "", prose: "", claim: "", objective: "", choice: "", stakes: "consequential", reversible: "partial" } : state.draft,
     view: "sit", activeSittingId: null, adaptiveEnabled: selected ? false : state.adaptiveEnabled, developmentEnabled: selected ? false : state.developmentEnabled, learningPaused: state.learningPaused, roleBias: selected ? {} : state.roleBias,
     developmentEvents: selected ? partialDevelopmentEvents(state.developmentEvents, caseIds) : state.developmentEvents,
+    developmentJobs: selected ? [] : state.developmentJobs,
+    developmentDeferredSourceEventIds: selected ? [] : state.developmentDeferredSourceEventIds,
   };
   const envelope: Envelope = { format: "limen-data", version: DATA_VERSION, exportedAt: Date.now(), data };
   const json = JSON.stringify(envelope);
@@ -117,7 +156,7 @@ export function exportData(state: LimenStore, selectedCaseIds?: string[]): strin
 export function parseImport(json: string, current: LimenStore) {
   if (utf8ByteLength(json) > MAX_DATA_BYTES) throw new Error("Import exceeds the 2 MB limit.");
   const raw: unknown = JSON.parse(json);
-  if (!object(raw) || raw.format !== "limen-data" || (raw.version !== 2 && raw.version !== DATA_VERSION)) throw new Error("Unsupported Limen export version.");
+  if (!object(raw) || raw.format !== "limen-data" || (raw.version !== 2 && raw.version !== 3 && raw.version !== DATA_VERSION)) throw new Error("Unsupported Limen export version.");
   const incoming = validateData(raw.data);
   const merge = <T extends { id: string }>(existing: T[], incomingRows: T[], label: string) => {
     const byId = new Map(existing.map((row) => [row.id, row]));
@@ -173,7 +212,15 @@ export function migrateLegacy(raw: unknown): Data {
 
 export function migrateV2(raw: unknown): Data {
   const prior = validateData(raw);
-  return { ...prior, developmentEnabled: false, developmentEvents: [] };
+  return { ...prior, developmentEnabled: false, developmentEvents: [], developmentJobs: [], developmentDeferredSourceEventIds: [] };
+}
+
+export function migrateV3(raw: unknown): Data {
+  const prior = validateData(raw);
+  const replay = replayDevelopment(prior.developmentEvents);
+  const jobs: DevelopmentJobState[] = replay.jobs.map((job) => ({ ...job, status: "queued", createdAt: replay.events.find((event) => event.kind === "job.queued" && event.payload.job.id === job.id)?.at ?? 0 }));
+  const recovered = recoverDevelopmentQueue({ jobs, deferredSourceEventIds: [] }, new Set(replay.events.map((event) => event.id)), DEVELOPMENT_JOB_INPUT_VERSION);
+  return { ...prior, developmentJobs: recovered.jobs, developmentDeferredSourceEventIds: recovered.deferredSourceEventIds };
 }
 
 function partialDevelopmentEvents(events: DevelopmentEvent[], selectedCaseIds: Set<string>): DevelopmentEvent[] {

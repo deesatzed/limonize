@@ -372,7 +372,8 @@ function validateObservation(value: unknown): ReleasedObservation {
     normalizedSource = { kind: "check_receipt", sourceId: id(source.sourceId, "receiptId"), criterionId: source.criterionId, checkerVersion: source.checkerVersion };
   } else if (source.kind === "simulation_release") {
     exact(source, ["kind", "sourceId", "worldVersion"], [], "simulation release source");
-    if (recordTrack !== "simulated" || row.status !== "simulated") reject("track_mismatch", "A simulation release cannot become real evidence.");
+    if (recordTrack !== "simulated" || (row.status !== "simulated" && row.status !== "unresolved")) reject("track_mismatch", "A simulation release cannot become real evidence.");
+    if (row.status === "unresolved" && row.result !== "inconclusive") reject("invalid_observation", "An unresolved simulation outcome cannot support or contradict an expectation.");
     normalizedSource = { kind: "simulation_release", sourceId: id(source.sourceId, "sourceId"), worldVersion: id(source.worldVersion, "worldVersion") };
   } else reject("invalid_observation_source", "Observation source is outside the supported vocabulary.");
   if (row.result !== "supports" && row.result !== "contradicts" && row.result !== "inconclusive") reject("invalid_observation", "Observation result is invalid.");
