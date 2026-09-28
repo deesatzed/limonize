@@ -28,7 +28,7 @@ This is a separate completed local change following the six enhancements. Govern
 
 [A0–A11](docs/plans/2026-09-23-autonomous-development-plan.md) remain proposed implementation work. The agreed direction includes both real and simulated experience, context-sensitive automatic/advisory behavior and autonomous reversible policy development. Charter integration supplies boundaries and current controls; it does not implement the expectation/competence/commitment cycle or establish its benefit.
 
-## Luna execution goal — active; final publication in progress
+## Luna execution goal — complete
 
 [GOAL_LUNA.md](GOAL_LUNA.md) is the user-requested execution contract for the next milestone. Follow [the runbook](docs/plans/2026-09-26-luna-execution.md) sequentially when invoked. Publication is to the goal branch; no main merge or deployment is included.
 
@@ -46,6 +46,6 @@ This is a separate completed local change following the six enhancements. Govern
 | L09 | Integrated product and rehearsal flow | done — desktop/mobile flow exposes candidate reviews and trial evidence |
 | L10 | Comparative evaluation and scope disposition | done — protected result does not meet benefit gate; simulation steering is shadowed |
 | L11 | Final tests/build/browser proof | done — current tests, typecheck, lint, isolated legacy evaluation/build, protected preflight, development-only evaluation, and dev/built desktop/mobile browser proof passed; screenshots visually inspected |
-| L12 | Report, commit, push and remote verification | in progress — final report reconciled; commit and branch publication remain |
+| L12 | Report, commit, push and remote verification | done — implementation commit and final truth-file closeout pushed; final branch SHA independently matched with `git ls-remote` |
 
 These tasks implement a bounded slice of the wider development roadmap. Record partial A-task coverage explicitly; do not mark all A0–A11 done when this milestone completes.

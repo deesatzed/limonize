@@ -8,7 +8,7 @@
 
 **Tech stack:** Existing TypeScript, React, Zustand, Node test runner, local deterministic checks and offline JS evaluation. No added model, database or provider.
 
-Status: L00–L11 complete; L12 final publication in progress. Do not create a worktree from the old HEAD before preserving the uncommitted foundation.
+Status: L00–L12 complete and verified on `luna/commitment-cycle`. Do not create a worktree from the old HEAD before preserving the uncommitted foundation.
 
 ## How to use each task
 
